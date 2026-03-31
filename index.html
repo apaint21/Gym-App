@@ -1,0 +1,368 @@
+Gym Tracker App html code
+
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workout Tracker - Detailed Sessions</title>
+<style>
+
+    body {
+
+      font-family: Arial, sans-serif;
+
+      background-color: #f4f4f4;
+
+      margin: 0;
+
+      padding: 20px;
+
+    }
+
+    h1 {
+
+      text-align: center;
+
+      margin-bottom: 20px;
+
+    }
+
+    .tabs {
+
+      display: flex;
+
+      flex-wrap: wrap;
+
+      justify-content: center;
+
+      margin-bottom: 20px;
+
+      gap: 5px;
+
+    }
+
+    .tab {
+
+      padding: 10px 15px;
+
+      background-color: #007bff;
+
+      color: white;
+
+      border: none;
+
+      cursor: pointer;
+
+      border-radius: 4px 4px 0 0;
+
+    }
+
+    .tab.active {
+
+      background-color: #0056b3;
+
+      font-weight: bold;
+
+    }
+
+    #workout-form {
+
+      display: flex;
+
+      flex-wrap: wrap;
+
+      justify-content: center;
+
+      gap: 10px;
+
+      margin-bottom: 20px;
+
+    }
+
+    input, select, button {
+
+      padding: 10px;
+
+      font-size: 16px;
+
+    }
+
+    button {
+
+      cursor: pointer;
+
+      background-color: #28a745;
+
+      color: white;
+
+      border: none;
+
+    }
+
+    button:hover {
+
+      background-color: #218838;
+
+    }
+
+    ul {
+
+      list-style: none;
+
+      padding: 0;
+
+      max-width: 650px;
+
+      margin: 0 auto;
+
+    }
+
+    li {
+
+      background: white;
+
+      margin: 5px 0;
+
+      padding: 10px;
+
+      border-left: 5px solid #28a745;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      flex-wrap: wrap;
+
+    }
+
+    .delete-btn {
+
+      background-color: #dc3545;
+
+      border: none;
+
+      padding: 5px 10px;
+
+      color: white;
+
+      cursor: pointer;
+
+      margin-left: 5px;
+
+    }
+
+    .delete-btn:hover {
+
+      background-color: #c82333;
+
+    }
+
+    #clear-btn {
+
+      display:block;
+
+      margin: 20px auto;
+
+      background-color:#007bff;
+
+    }
+
+    .session-info {
+
+      flex: 1;
+
+      margin-right: 10px;
+
+    }
+
+    .session-meta {
+
+      font-size: 0.9em;
+
+      color: #555;
+
+    }
+</style>
+</head>
+<body>
+<h1>Workout Tracker</h1>
+<!-- Tabs -->
+<div class="tabs">
+<button class="tab active" data-day="day1_1hr">Day 1 (1hr)</button>
+<button class="tab" data-day="day2_1hr">Day 2 (1hr)</button>
+<button class="tab" data-day="day3_1hr">Day 3 (1hr)</button>
+<button class="tab" data-day="day1_lt1hr">Day 1 (<1hr)</button>
+<button class="tab" data-day="day2_lt1hr">Day 2 (<1hr)</button>
+<button class="tab" data-day="day3_lt1hr">Day 3 (<1hr)</button>
+<button class="tab" data-day="day1_2of2">Day 1 of 2</button>
+<button class="tab" data-day="day2_2of2">Day 2 of 2</button>
+</div>
+<!-- Form -->
+<form id="workout-form">
+<input type="text" id="exercise-input" placeholder="Exercise (e.g., Push-ups)" required>
+<input type="number" id="reps-input" placeholder="Reps" min="1" required>
+<input type="number" id="sets-input" placeholder="Sets" min="1" required>
+<select id="side-input" required>
+<option value="">Single/Both</option>
+<option value="Single Leg/Arm">Single Leg/Arm</option>
+<option value="Bilateral">Both</option>
+</select>
+<select id="equip-input" required>
+<option value="">Equipment</option>
+<option value="BB">Barbell (BB)</option>
+<option value="KB">Kettlebell (KB)</option>
+<option value="DB">Dumbbell (DB)</option>
+<option value="BW">Bodyweight (BW)</option>
+</select>
+<button type="submit">Add Session</button>
+</form>
+<!-- Workout List -->
+<ul id="workout-list"></ul>
+<button id="clear-btn">Clear All Sessions for This Day</button>
+<script>
+
+    const tabs = document.querySelectorAll('.tab');
+
+    const form = document.getElementById('workout-form');
+
+    const exerciseInput = document.getElementById('exercise-input');
+
+    const repsInput = document.getElementById('reps-input');
+
+    const setsInput = document.getElementById('sets-input');
+
+    const sideInput = document.getElementById('side-input');
+
+    const equipInput = document.getElementById('equip-input');
+
+    const list = document.getElementById('workout-list');
+
+    const clearBtn = document.getElementById('clear-btn');
+
+    let currentDay = 'day1_1hr';
+
+    let workoutsData = {};
+
+    // Load from localStorage
+
+    if(localStorage.getItem('workoutsData')) {
+
+      workoutsData = JSON.parse(localStorage.getItem('workoutsData'));
+
+    }
+
+    function renderWorkouts() {
+
+      list.innerHTML = '';
+
+      const sessions = workoutsData[currentDay] || [];
+
+      sessions.forEach((session, index) => {
+
+        const li = document.createElement('li');
+
+        li.innerHTML = `
+<div class="session-info">
+<strong>${session.exercise}</strong> - ${session.sets} sets x ${session.reps} reps
+<div class="session-meta">${session.side} | ${session.equipment}</div>
+</div>
+
+        `;
+
+        const delBtn = document.createElement('button');
+
+        delBtn.textContent = 'Delete';
+
+        delBtn.classList.add('delete-btn');
+
+        delBtn.addEventListener('click', () => {
+
+          workoutsData[currentDay].splice(index, 1);
+
+          localStorage.setItem('workoutsData', JSON.stringify(workoutsData));
+
+          renderWorkouts();
+
+        });
+
+        li.appendChild(delBtn);
+
+        list.appendChild(li);
+
+      });
+
+    }
+
+    // Initial render
+
+    renderWorkouts();
+
+    // Add session
+
+    form.addEventListener('submit', (e) => {
+
+      e.preventDefault();
+
+      const exercise = exerciseInput.value.trim();
+
+      const reps = parseInt(repsInput.value);
+
+      const sets = parseInt(setsInput.value);
+
+      const side = sideInput.value;
+
+      const equipment = equipInput.value;
+
+      if(exercise && reps > 0 && sets > 0 && side && equipment) {
+
+        if(!workoutsData[currentDay]) workoutsData[currentDay] = [];
+
+        workoutsData[currentDay].push({ exercise, reps, sets, side, equipment });
+
+        localStorage.setItem('workoutsData', JSON.stringify(workoutsData));
+
+        renderWorkouts();
+
+        form.reset();
+
+      }
+
+    });
+
+    // Tab switching
+
+    tabs.forEach(tab => {
+
+      tab.addEventListener('click', () => {
+
+        tabs.forEach(t => t.classList.remove('active'));
+
+        tab.classList.add('active');
+
+        currentDay = tab.dataset.day;
+
+        renderWorkouts();
+
+      });
+
+    });
+
+    // Clear all for current day
+
+    clearBtn.addEventListener('click', () => {
+
+      workoutsData[currentDay] = [];
+
+      localStorage.setItem('workoutsData', JSON.stringify(workoutsData));
+
+      renderWorkouts();
+
+    });
+</script>
+</body>
+</html>
+ 
