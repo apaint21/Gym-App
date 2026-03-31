@@ -46,7 +46,9 @@ li { background:white; margin:5px 0; padding:10px; border-left:5px solid #28a745
 </div>
 
 <form id="workout-form">
-<input type="text" id="exercise-input" placeholder="Exercise" required readonly>
+<select id="exercise-input" required>
+  <option value="">Select Exercise</option>
+</select>
 <input type="number" id="weight-input" placeholder="Weight" min="0">
 <input type="number" id="reps-input" placeholder="Reps" min="1">
 <input type="number" id="sets-input" placeholder="Sets" min="1">
@@ -103,6 +105,7 @@ const feedbackBtns = document.querySelectorAll('.feedback-btn');
 let currentDay = 'day1_1hr';
 let workoutsData = {};
 
+// Template with exercises, sets/reps/rest
 const workoutsTemplate = {
   day1_1hr:[
     {exercise:"Squat", sets:3, reps:"12-15", rest:150},
@@ -126,11 +129,11 @@ const workoutsTemplate = {
     {exercise:"Incline DB Press", sets:3, reps:"8-10", rest:75},
     {exercise:"Bi/Tri Superset", sets:2, reps:"10-12", rest:60}
   ],
-  day1_lt1hr:[ /* You can add exercises for this tab if needed */ ],
-  day2_lt1hr:[ /* ... */ ],
-  day3_lt1hr:[ /* ... */ ],
-  day1_2of2:[ /* ... */ ],
-  day2_2of2:[ /* ... */ ]
+  day1_lt1hr:[],
+  day2_lt1hr:[],
+  day3_lt1hr:[],
+  day1_2of2:[],
+  day2_2of2:[]
 };
 
 // Load from localStorage or use template
@@ -140,14 +143,26 @@ if(localStorage.getItem('workoutsData')){
   workoutsData = JSON.parse(JSON.stringify(workoutsTemplate));
 }
 
+// Populate exercise dropdown
+function populateExerciseDropdown(){
+  exerciseInput.innerHTML='<option value="">Select Exercise</option>';
+  (workoutsTemplate[currentDay]||[]).forEach(ex=>{
+    const opt=document.createElement('option');
+    opt.value=ex.exercise;
+    opt.textContent=ex.exercise;
+    exerciseInput.appendChild(opt);
+  });
+}
+populateExerciseDropdown();
+
 function renderWorkouts(){
-  list.innerHTML = '';
-  const sessions = workoutsData[currentDay] || [];
+  list.innerHTML='';
+  const sessions = workoutsData[currentDay]||[];
   sessions.forEach((session,index)=>{
     const li=document.createElement('li');
     li.innerHTML=`<div class="session-info">
       <strong>${session.exercise}</strong> - ${session.sets} sets x ${session.reps} reps
-      <div class="session-meta">Weight: ${session.weight || '-'} | Side: ${session.side || '-'} | Equip: ${session.equipment || '-'} | Rest: ${session.rest || '-'} sec | Feedback: ${session.feedback || '-'}</div>
+      <div class="session-meta">Weight: ${session.weight||'-'} | Side: ${session.side||'-'} | Equip: ${session.equipment||'-'} | Rest: ${session.rest||'-'} sec | Feedback: ${session.feedback||'-'}</div>
     </div>`;
     const delBtn=document.createElement('button');
     delBtn.textContent='Delete';
@@ -168,6 +183,20 @@ feedbackBtns.forEach(btn=>{
     feedbackBtns.forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   });
+});
+
+// Update fields when selecting exercise
+exerciseInput.addEventListener('change',()=>{
+  const selected = workoutsTemplate[currentDay].find(ex=>ex.exercise===exerciseInput.value);
+  if(selected){
+    setsInput.value = selected.sets;
+    repsInput.value = selected.reps;
+    restInput.value = selected.rest;
+    weightInput.value = '';
+    sideInput.value = '';
+    equipInput.value = '';
+    feedbackBtns.forEach(b=>b.classList.remove('active'));
+  }
 });
 
 // Superset auto-populate
@@ -217,6 +246,7 @@ tabs.forEach(tab=>{
     tabs.forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     currentDay = tab.dataset.day;
+    populateExerciseDropdown();
     renderWorkouts();
   });
 });
