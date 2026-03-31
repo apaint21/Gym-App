@@ -25,6 +25,7 @@ li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28
 .session-info { flex: 1; margin-right: 10px; }
 .session-meta { font-size: 0.9em; color: #555; }
 .superset-select { margin: 5px 5px 5px 0; }
+#rest-display { font-weight:bold; margin-left:10px; }
 </style>
 </head>
 <body>
@@ -42,7 +43,7 @@ li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28
 
 <form id="workout-form">
 <select id="exercise-input" required></select>
-<span id="rest-display" style="margin-left:10px; font-weight:bold;"></span>
+<span id="rest-display"></span>
 <input type="number" id="reps-input" placeholder="Reps Completed" min="1" required>
 <input type="number" id="sets-input" placeholder="Sets" min="1" required readonly>
 <input type="number" id="weight-input" placeholder="Weight">
@@ -93,183 +94,176 @@ const exportBtn = document.getElementById('export-btn');
 let currentDay = 'day1_1hr';
 let workoutsData = {};
 
-// Full preloaded exercises including all <1hr and 1hr tabs
+// --- ORIGINAL PRELOADED EXERCISES PRESERVED ---
 const preloadedExercises = {
-  // 1hr sessions (original from your first code)
-  day1_1hr: [
-    { name: 'Squat', sets: 3, reps: '12-15', rest: '2-3 min', type:'normal' },
-    { name: 'RDL', sets: 3, reps: '6-8', rest: '90 sec', type:'normal' },
-    { name: 'Incline DB Press', sets: 3, reps: '6-8', rest: '75-90 sec', type:'normal' },
-    { name: 'Row', sets: 3, reps: '8-10', rest: '75-90 sec', type:'normal' },
-    { name: 'Plank', sets: 2, reps: '60 sec', rest: '', type:'normal' }
-  ],
-  day2_1hr: [
-    { name: 'Pull-Ups or Lat Pulldown', sets: 4, reps: 'AMAP', rest: '90-120 sec', type:'normal' },
-    { name: 'DB Bench', sets: 3, reps: '8-10', rest: '120 sec', type:'normal' },
-    { name: 'Bulgarian Split Squat', sets: 3, reps: '8 / leg', rest: '60 sec', type:'normal' },
-    { name: 'Hamstring Curl', sets: 2, reps: '10-12', rest: '60 sec', type:'normal' },
-    { name: 'Face Pulls', sets: 2, reps: '12-15', rest: '60 sec', type:'normal' }
-  ],
-  day3_1hr: [
-    { name: 'Squat', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
-    { name: 'Hip Thrust or Glute Bridge', sets: 3, reps: '8-12', rest: '90 sec', type:'normal' },
-    { name: 'DB Row', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
-    { name: 'Incline DB Press', sets: 3, reps: '8-10', rest: '75-90 sec', type:'normal' },
-    { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', type:'superset', subExercises: [
-      { name: 'Ez Bar Curl' },
-      { name: 'DB Curl' },
-      { name: 'Rope Pushdown' },
-      { name: 'Overhead Extension' }
-    ]}
-  ],
-
-  // <1hr sessions (from your list)
-  day1_lt1hr: [
-    { name: 'Squat', sets: 3, reps: '12-15', rest: '120 sec', type:'normal' },
-    { name: 'Chest/Back Superset', sets: 3, reps: '6-10', rest: '60-75 sec', type:'superset', subExercises:[
-      { name:'Incline Press', sets:3, reps:'6-8' },
-      { name:'Row', sets:3, reps:'8-10' }
-    ]},
-    { name: 'RDL', sets: 3, reps: '6-8', rest: '75-90 sec', type:'normal' },
-    { name: 'Plank', sets: 2, reps: '60', rest: '', type:'normal' }
-  ],
-  day2_lt1hr: [
-    { name: 'Pull-Ups or Lat Pulldown', sets:4, reps:'AMAP', rest:'', type:'normal' },
-    { name: 'Superset', sets:3, reps:'8-15', rest:'60 sec', type:'superset', subExercises:[
-      { name:'Bench', sets:3, reps:'8-10' },
-      { name:'Face Pulls', sets:3, reps:'12-15' }
-    ]},
-    { name: 'Bulgarian Split Squat', sets:3, reps:'8', rest:'60 sec', type:'normal' },
-    { name: 'Hamstring Curl', sets:2, reps:'10-12', rest:'90 sec', type:'normal' }
-  ],
-  day3_lt1hr: [
-    { name: 'Squat', sets:3, reps:'8-10', rest:'90 sec', type:'normal' },
-    { name: 'Hip Thrust or Glute Bridge', sets:3, reps:'8-12', rest:'90 sec', type:'normal' },
-    { name: 'Chest/Back Superset', sets:3, reps:'8-10', rest:'60 sec', type:'superset', subExercises:[
-      { name:'Row', sets:3, reps:'8-10' },
-      { name:'Incline Press', sets:3, reps:'8-10' }
-    ]},
-    { name: 'Bi/Tri Superset', sets:2, reps:'10-12', rest:'60 sec', type:'superset', subExercises:[
-      { name:'EZ Bar Curl', sets:2, reps:'10-12' },
-      { name:'DB Curl', sets:2, reps:'10-12' },
-      { name:'Rope Pushdown', sets:2, reps:'10-12' },
-      { name:'Overhead Extension', sets:2, reps:'10-12' }
-    ]}
-  ]
+day1_1hr: [
+{ name: 'Squat', sets: 3, reps: '12-15', rest: '2-3 min', type:'normal' },
+{ name: 'RDL', sets: 3, reps: '6-8', rest: '90 sec', type:'normal' },
+{ name: 'Incline DB Press', sets: 3, reps: '6-8', rest: '75-90 sec', type:'normal' },
+{ name: 'Row', sets: 3, reps: '8-10', rest: '75-90 sec', type:'normal' },
+{ name: 'Plank', sets: 2, reps: '60 sec', rest: '', type:'normal' }
+],
+day2_1hr: [
+{ name: 'Pull-Ups or Lat Pulldown', sets: 4, reps: 'AMAP', rest: '90-120 sec', type:'normal' },
+{ name: 'DB Bench', sets: 3, reps: '8-10', rest: '120 sec', type:'normal' },
+{ name: 'Bulgarian Split Squat', sets: 3, reps: '8 / leg', rest: '60 sec', type:'normal' },
+{ name: 'Hamstring Curl', sets: 2, reps: '10-12', rest: '60 sec', type:'normal' },
+{ name: 'Face Pulls', sets: 2, reps: '12-15', rest: '60 sec', type:'normal' }
+],
+day3_1hr: [
+{ name: 'Squat', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
+{ name: 'Hip Thrust or Glute Bridge', sets: 3, reps: '8-12', rest: '90 sec', type:'normal' },
+{ name: 'DB Row', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
+{ name: 'Incline DB Press', sets: 3, reps: '8-10', rest: '75-90 sec', type:'normal' },
+{ name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', type:'superset', subExercises: [
+{ name: 'Ez Bar Curl' },
+{ name: 'DB Curl' },
+{ name: 'Rope Pushdown' },
+{ name: 'Overhead Extension' }
+]}
+],
+day1_lt1hr: [
+{ name: 'Squat', sets: 3, reps: '12-15', rest: '120 sec', type:'normal' },
+{ name: 'Chest/Back Superset', sets: 3, reps: '6-10', rest: '60-75 sec', type:'superset', subExercises:[
+{ name:'Incline Press', sets:3, reps:'6-8' },
+{ name:'Row', sets:3, reps:'8-10' }
+]},
+{ name: 'RDL', sets: 3, reps: '6-8', rest: '75-90 sec', type:'normal' },
+{ name: 'Plank', sets: 2, reps: '60', rest: '', type:'normal' }
+],
+day2_lt1hr: [
+{ name: 'Pull-Ups or Lat Pulldown', sets:4, reps:'AMAP', rest:'', type:'normal' },
+{ name: 'Superset', sets:3, reps:'8-15', rest:'60 sec', type:'superset', subExercises:[
+{ name:'Bench', sets:3, reps:'8-10' },
+{ name:'Face Pulls', sets:3, reps:'12-15' }
+]},
+{ name: 'Bulgarian Split Squat', sets:3, reps:'8', rest:'60 sec', type:'normal' },
+{ name: 'Hamstring Curl', sets:2, reps:'10-12', rest:'90 sec', type:'normal' }
+],
+day3_lt1hr: [
+{ name: 'Squat', sets:3, reps:'8-10', rest:'90 sec', type:'normal' },
+{ name: 'Hip Thrust or Glute Bridge', sets:3, reps:'8-12', rest:'90 sec', type:'normal' },
+{ name: 'Chest/Back Superset', sets:3, reps:'8-10', rest:'60 sec', type:'superset', subExercises:[
+{ name:'Row', sets:3, reps:'8-10' },
+{ name:'Incline Press', sets:3, reps:'8-10' }
+]},
+{ name: 'Bi/Tri Superset', sets:2, reps:'10-12', rest:'60 sec', type:'superset', subExercises:[
+{ name:'EZ Bar Curl', sets:2, reps:'10-12' },
+{ name:'DB Curl', sets:2, reps:'10-12' },
+{ name:'Rope Pushdown', sets:2, reps:'10-12' },
+{ name:'Overhead Extension', sets:2, reps:'10-12' }
+]}
+]
 };
 
-// Load saved data
+// --- Load saved data ---
 if(localStorage.getItem('workoutsData')) { workoutsData = JSON.parse(localStorage.getItem('workoutsData')); }
 
-// Functions to populate dropdown, render workouts, handle supersets...
-// (same as previous working script)
-
+// --- Functions ---
 function populateExerciseDropdown() {
-  exerciseInput.innerHTML = '';
-  const exercises = preloadedExercises[currentDay];
-  exercises.forEach(ex => {
-    const opt = document.createElement('option');
-    opt.value = ex.name;
-    opt.textContent = ex.name;
-    exerciseInput.appendChild(opt);
-  });
-  updateExerciseDetails();
+exerciseInput.innerHTML='';
+const exercises = preloadedExercises[currentDay];
+exercises.forEach(ex => {
+const opt = document.createElement('option');
+opt.value = ex.name;
+opt.textContent = ex.name;
+exerciseInput.appendChild(opt);
+});
+updateExerciseDetails();
 }
 
-function updateExerciseDetails() {
-  const selected = preloadedExercises[currentDay].find(e=>e.name===exerciseInput.value);
-  if(selected){
-    setsInput.value = selected.sets;
-    restDisplay.textContent = selected.rest;
-    if(selected.type==='superset'){
-      renderSupersetOptions(selected);
-    } else { supersetContainer.innerHTML=''; }
-    const past = (workoutsData[currentDay]||[]).filter(s=>s.exercise===selected.name);
-    weightInput.value = past.length ? past[past.length-1].weight||'' : '';
-  }
+function updateExerciseDetails(){
+const selected = preloadedExercises[currentDay].find(e=>e.name===exerciseInput.value);
+if(selected){
+setsInput.value = selected.sets;
+restDisplay.textContent = selected.rest;
+if(selected.type==='superset'){ renderSupersetOptions(selected); } else { supersetContainer.innerHTML=''; }
+const past = (workoutsData[currentDay]||[]).filter(s=>s.exercise===selected.name);
+weightInput.value = past.length ? past[past.length-1].weight||'' : '';
+}
 }
 
 function renderSupersetOptions(ex){
-  supersetContainer.innerHTML='';
-  ex.subExercises.forEach((sub,i)=>{
-    const sel = document.createElement('select');
-    sel.classList.add('superset-select');
-    sel.dataset.parent = ex.name;
-    sel.dataset.index = i;
-    const defaultOpt = document.createElement('option');
-    defaultOpt.value=''; defaultOpt.textContent='Select '+sub.name;
-    sel.appendChild(defaultOpt);
-    ['BB','DB','KB','BW'].forEach(eq=>{ const o=document.createElement('option'); o.value=eq; o.textContent=eq; sel.appendChild(o); });
-    const past = (workoutsData[currentDay]||[]).filter(s=>s.exercise===sub.name);
-    if(past.length && past[past.length-1].weight) sel.value = past[past.length-1].weight;
-    supersetContainer.appendChild(sel);
-  });
+supersetContainer.innerHTML='';
+ex.subExercises.forEach((sub,i)=>{
+const sel = document.createElement('select');
+sel.classList.add('superset-select');
+sel.dataset.parent = ex.name;
+sel.dataset.index = i;
+const defaultOpt = document.createElement('option');
+defaultOpt.value=''; defaultOpt.textContent='Select '+sub.name;
+sel.appendChild(defaultOpt);
+['BB','DB','KB','BW'].forEach(eq=>{ const o=document.createElement('option'); o.value=eq; o.textContent=eq; sel.appendChild(o); });
+const past = (workoutsData[currentDay]||[]).filter(s=>s.exercise===sub.name);
+if(past.length && past[past.length-1].weight) sel.value = past[past.length-1].weight;
+supersetContainer.appendChild(sel);
+});
 }
 
 function renderWorkouts(){
-  list.innerHTML='';
-  const sessions = workoutsData[currentDay]||[];
-  sessions.forEach((s,index)=>{
-    const li = document.createElement('li');
-    li.innerHTML=`<div class="session-info"><strong>${s.exercise}</strong> - ${s.sets} sets x ${s.reps} reps<div class="session-meta">${s.side} | ${s.equipment} | Mood: ${s.mood} | Weight: ${s.weight||''}</div></div>`;
-    const delBtn=document.createElement('button');
-    delBtn.textContent='Delete'; delBtn.classList.add('delete-btn');
-    delBtn.addEventListener('click',()=>{
-      workoutsData[currentDay].splice(index,1);
-      localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
-      renderWorkouts();
-    });
-    li.appendChild(delBtn);
-    list.appendChild(li);
-  });
+list.innerHTML='';
+const sessions = workoutsData[currentDay]||[];
+sessions.forEach((s,index)=>{
+const li = document.createElement('li');
+li.innerHTML=`<div class="session-info"><strong>${s.exercise}</strong> - ${s.sets} sets x ${s.reps} reps<div class="session-meta">${s.side} | ${s.equipment} | Mood: ${s.mood} | Weight: ${s.weight||''}</div></div>`;
+const delBtn=document.createElement('button');
+delBtn.textContent='Delete'; delBtn.classList.add('delete-btn');
+delBtn.addEventListener('click',()=>{
+workoutsData[currentDay].splice(index,1);
+localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
+renderWorkouts();
+});
+li.appendChild(delBtn);
+list.appendChild(li);
+});
 }
 
-// Form submit
+// --- Form submit ---
 form.addEventListener('submit',e=>{
-  e.preventDefault();
-  const exercise=exerciseInput.value;
-  const reps=repsInput.value;
-  const sets=setsInput.value;
-  const weight=weightInput.value;
-  const side=sideInput.value;
-  const equipment=equipInput.value;
-  const mood=moodInput.value;
-  if(!workoutsData[currentDay]) workoutsData[currentDay]=[];
-  workoutsData[currentDay].push({exercise,reps,sets,weight,side,equipment,mood});
-  localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
-  renderWorkouts();
-  form.reset();
-  setsInput.value=''; restDisplay.textContent=''; supersetContainer.innerHTML='';
+e.preventDefault();
+const exercise=exerciseInput.value;
+const reps=repsInput.value;
+const sets=setsInput.value;
+const weight=weightInput.value;
+const side=sideInput.value;
+const equipment=equipInput.value;
+const mood=moodInput.value;
+if(!workoutsData[currentDay]) workoutsData[currentDay]=[];
+workoutsData[currentDay].push({exercise,reps,sets,weight,side,equipment,mood});
+localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
+renderWorkouts();
+form.reset();
+setsInput.value=''; restDisplay.textContent=''; supersetContainer.innerHTML='';
 });
 
-// Tabs
+// --- Tabs ---
 tabs.forEach(tab=>{ tab.addEventListener('click',()=>{
-  tabs.forEach(t=>t.classList.remove('active'));
-  tab.classList.add('active');
-  currentDay=tab.dataset.day;
-  populateExerciseDropdown();
-  renderWorkouts();
+tabs.forEach(t=>t.classList.remove('active'));
+tab.classList.add('active');
+currentDay=tab.dataset.day;
+populateExerciseDropdown();
+renderWorkouts();
 }); });
 
-// Clear
+// --- Clear ---
 clearBtn.addEventListener('click',()=>{
-  workoutsData[currentDay]=[];
-  localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
-  renderWorkouts();
+workoutsData[currentDay]=[];
+localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
+renderWorkouts();
 });
 
-// Export CSV
+// --- Export ---
 exportBtn.addEventListener('click',()=>{
-  const rows=[['Exercise','Sets','Reps','Weight','Side','Equipment','Mood']];
-  (workoutsData[currentDay]||[]).forEach(s=>rows.push([s.exercise,s.sets,s.reps,s.weight||'',s.side,s.equipment,s.mood]));
-  let csvContent="data:text/csv;charset=utf-8," + rows.map(r=>r.join(",")).join("\n");
-  const encodedUri=encodeURI(csvContent);
-  const link=document.createElement('a'); link.setAttribute('href',encodedUri);
-  link.setAttribute('download',currentDay+"_workouts.csv");
-  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+const rows=[['Exercise','Sets','Reps','Weight','Side','Equipment','Mood']];
+(workoutsData[currentDay]||[]).forEach(s=>rows.push([s.exercise,s.sets,s.reps,s.weight||'',s.side,s.equipment,s.mood]));
+let csvContent="data:text/csv;charset=utf-8," + rows.map(r=>r.join(",")).join("\n");
+const encodedUri=encodeURI(csvContent);
+const link=document.createElement('a'); link.setAttribute('href',encodedUri);
+link.setAttribute('download',currentDay+"_workouts.csv");
+document.body.appendChild(link); link.click(); document.body.removeChild(link);
 });
 
-// Initial setup
+// --- Initial ---
 populateExerciseDropdown();
 renderWorkouts();
 exerciseInput.addEventListener('change', updateExerciseDetails);
