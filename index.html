@@ -218,6 +218,19 @@ function renderWorkouts() {
   const sessions = workoutsData[currentDay] || [];
   const prs = getPRs();
 
+  // ✅ RESTORE: Preloaded exercises display
+  preloadedExercises[currentDay].forEach(ex => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <div class="session-info">
+        <strong>${ex.name}</strong> - ${ex.sets} sets x ${ex.reps}
+        <div class="session-meta">Rest: ${ex.rest}</div>
+      </div>
+    `;
+    list.appendChild(li);
+  });
+
+  // ✅ User sessions (with PR highlight)
   sessions.forEach((s,i)=>{
     const isPR = Number(s.weight) === prs[s.exercise];
 
@@ -243,7 +256,7 @@ function renderWorkouts() {
     list.appendChild(li);
   });
 }
-
+  
 function renderProgress() {
   list.innerHTML = '';
   const prs = getPRs();
