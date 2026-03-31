@@ -87,8 +87,8 @@ const exercises = [
   { name: 'Hip Thrust or Glute Bridge', sets: 3, reps: '8-12', rest: '90 sec', type:'normal' },
   { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', type:'superset', subExercises: [
       { name: 'EZ Bar Curl', lastWeight: '', reps: '' },
-      { name: 'Rope Pushdown', lastWeight: '', reps: '' },
       { name: 'DB Curl', lastWeight: '', reps: '' },
+      { name: 'Rope Pushdown', lastWeight: '', reps: '' },
       { name: 'Overhead Extension', lastWeight: '', reps: '' }
   ]},
 ];
@@ -132,10 +132,10 @@ exerciseInput.addEventListener('change', ()=>{
     // populate sub1 and sub2
     sub1Select.innerHTML='';
     sub2Select.innerHTML='';
-    ['EZ Bar Curl','Rope Pushdown'].forEach(name=>{
+    ['EZ Bar Curl','DB Curl'].forEach(name=>{
       const o = document.createElement('option'); o.value=name; o.textContent=name; sub1Select.appendChild(o);
     });
-    ['DB Curl','Overhead Extension'].forEach(name=>{
+    ['Rope Pushdown','Overhead Extension'].forEach(name=>{
       const o = document.createElement('option'); o.value=name; o.textContent=name; sub2Select.appendChild(o);
     });
     sub1History.textContent='';
