@@ -23,6 +23,8 @@ li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28
 .session-meta { font-size: 0.9em; color: #555; }
 .history { font-size: 0.8em; color: #888; margin-top: 5px; }
 .sub-exercise { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.sub-line { display: flex; align-items: center; gap: 10px; }
+.rest { font-weight: bold; color: #555; }
 </style>
 </head>
 <body>
@@ -32,9 +34,12 @@ li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28
   <select id="exercise-input" required></select>
   
   <div id="normal-inputs">
-    <input type="number" id="reps-input" placeholder="Reps Completed" min="1">
-    <input type="number" id="sets-input" placeholder="Sets" readonly>
-    <input type="number" id="weight-input" placeholder="Weight Used">
+    <div class="sub-line">
+      <input type="number" id="reps-input" placeholder="Reps Completed" min="1">
+      <input type="number" id="sets-input" placeholder="Sets" readonly>
+      <input type="number" id="weight-input" placeholder="Weight Used">
+      <span id="rest-display" class="rest"></span>
+    </div>
     <select id="side-input">
       <option value="">Single/Both</option>
       <option value="Single Leg/Arm">Single Leg/Arm</option>
@@ -55,14 +60,17 @@ li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28
     </select>
   </div>
 
-  <!-- Superset container with independent inputs for each sub-exercise -->
   <div id="superset-container" style="display:none; flex-direction: column; gap:10px;">
     
     <div class="sub-exercise">
       <strong>Sub-Exercise 1</strong>
-      <select id="sub1-select"></select>
-      <input type="number" id="sub1-reps" placeholder="Reps">
-      <input type="number" id="sub1-weight" placeholder="Weight">
+      <div class="sub-line">
+        <select id="sub1-select"></select>
+        <input type="number" id="sub1-reps" placeholder="Reps">
+        <input type="number" id="sub1-sets" placeholder="Sets" readonly>
+        <input type="number" id="sub1-weight" placeholder="Weight">
+        <span id="sub1-rest" class="rest"></span>
+      </div>
       <select id="sub1-side">
         <option value="">Single/Both</option>
         <option value="Single Leg/Arm">Single Leg/Arm</option>
@@ -86,9 +94,13 @@ li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28
 
     <div class="sub-exercise">
       <strong>Sub-Exercise 2</strong>
-      <select id="sub2-select"></select>
-      <input type="number" id="sub2-reps" placeholder="Reps">
-      <input type="number" id="sub2-weight" placeholder="Weight">
+      <div class="sub-line">
+        <select id="sub2-select"></select>
+        <input type="number" id="sub2-reps" placeholder="Reps">
+        <input type="number" id="sub2-sets" placeholder="Sets" readonly>
+        <input type="number" id="sub2-weight" placeholder="Weight">
+        <span id="sub2-rest" class="rest"></span>
+      </div>
       <select id="sub2-side">
         <option value="">Single/Both</option>
         <option value="Single Leg/Arm">Single Leg/Arm</option>
@@ -122,6 +134,7 @@ li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28
 const form = document.getElementById('workout-form');
 const exerciseInput = document.getElementById('exercise-input');
 const setsInput = document.getElementById('sets-input');
+const restDisplay = document.getElementById('rest-display');
 
 let workoutsData = JSON.parse(localStorage.getItem('day3_1hr')) || [];
 
@@ -136,7 +149,6 @@ const exercises = [
   ]}
 ];
 
-// Populate main exercise dropdown
 function populateExerciseDropdown(){
   exerciseInput.innerHTML='';
   exercises.forEach(ex=>{
@@ -148,7 +160,6 @@ function populateExerciseDropdown(){
 }
 populateExerciseDropdown();
 
-// Render workout history
 function renderWorkouts(){
   const list=document.getElementById('workout-list');
   list.innerHTML='';
@@ -165,20 +176,28 @@ function renderWorkouts(){
 }
 renderWorkouts();
 
-// Handle exercise change
 exerciseInput.addEventListener('change',()=>{
   const ex=exercises.find(e=>e.name===exerciseInput.value);
   setsInput.value=ex.sets;
+  restDisplay.textContent=ex.rest || '';
   if(ex.type==='superset'){
     document.getElementById('superset-container').style.display='flex';
-    // Populate sub-exercises
+    document.getElementById('normal-inputs').style.display='none';
+    
     const sub1Select=document.getElementById('sub1-select');
     const sub2Select=document.getElementById('sub2-select');
     sub1Select.innerHTML=''; sub2Select.innerHTML='';
     ['EZ Bar Curl','DB Curl'].forEach(n=>{const o=document.createElement('option'); o.value=n; o.textContent=n; sub1Select.appendChild(o);});
     ['Rope Pushdown','Overhead Extension'].forEach(n=>{const o=document.createElement('option'); o.value=n; o.textContent=n; sub2Select.appendChild(o);});
-    updateHistory(sub1Select,'sub1-history'); updateHistory(sub2Select,'sub2-history');
-    document.getElementById('normal-inputs').style.display='none';
+    
+    document.getElementById('sub1-sets').value=ex.sets;
+    document.getElementById('sub2-sets').value=ex.sets;
+    document.getElementById('sub1-rest').textContent=ex.rest;
+    document.getElementById('sub2-rest').textContent=ex.rest;
+    
+    updateHistory(sub1Select,'sub1-history');
+    updateHistory(sub2Select,'sub2-history');
+    
   } else {
     document.getElementById('superset-container').style.display='none';
     document.getElementById('normal-inputs').style.display='flex';
@@ -190,17 +209,15 @@ function updateHistory(selectElem,id){
   document.getElementById(id).textContent=last?`Last: ${last.reps} reps @ ${last.weight} ${last.side} | ${last.equipment} | Mood: ${last.mood}`:'';
 }
 
-// Update history on sub-exercise change
 document.getElementById('sub1-select').addEventListener('change',()=>updateHistory(document.getElementById('sub1-select'),'sub1-history'));
 document.getElementById('sub2-select').addEventListener('change',()=>updateHistory(document.getElementById('sub2-select'),'sub2-history'));
 
-// Submit form
 form.addEventListener('submit',e=>{
   e.preventDefault();
   const exName=exerciseInput.value;
   if(exName==='Bi/Tri Superset'){
-    const sub1={ exercise: document.getElementById('sub1-select').value, sets: setsInput.value, reps: document.getElementById('sub1-reps').value, weight: document.getElementById('sub1-weight').value, side: document.getElementById('sub1-side').value, equipment: document.getElementById('sub1-equip').value, mood: document.getElementById('sub1-mood').value };
-    const sub2={ exercise: document.getElementById('sub2-select').value, sets: setsInput.value, reps: document.getElementById('sub2-reps').value, weight: document.getElementById('sub2-weight').value, side: document.getElementById('sub2-side').value, equipment: document.getElementById('sub2-equip').value, mood: document.getElementById('sub2-mood').value };
+    const sub1={ exercise: document.getElementById('sub1-select').value, sets: document.getElementById('sub1-sets').value, reps: document.getElementById('sub1-reps').value, weight: document.getElementById('sub1-weight').value, side: document.getElementById('sub1-side').value, equipment: document.getElementById('sub1-equip').value, mood: document.getElementById('sub1-mood').value };
+    const sub2={ exercise: document.getElementById('sub2-select').value, sets: document.getElementById('sub2-sets').value, reps: document.getElementById('sub2-reps').value, weight: document.getElementById('sub2-weight').value, side: document.getElementById('sub2-side').value, equipment: document.getElementById('sub2-equip').value, mood: document.getElementById('sub2-mood').value };
     workoutsData.push(sub1,sub2);
   } else {
     const normal={ exercise: exName, sets: setsInput.value, reps: document.getElementById('reps-input').value, weight: document.getElementById('weight-input').value, side: document.getElementById('side-input').value, equipment: document.getElementById('equip-input').value, mood: document.getElementById('mood-input').value };
@@ -210,11 +227,11 @@ form.addEventListener('submit',e=>{
   renderWorkouts();
   form.reset();
   setsInput.value=exercises.find(e=>e.name===exerciseInput.value).sets;
+  restDisplay.textContent=exercises.find(e=>e.name===exerciseInput.value).rest;
   document.getElementById('superset-container').style.display='none';
   document.getElementById('normal-inputs').style.display='flex';
 });
 
-// Clear all
 document.getElementById('clear-btn').addEventListener('click',()=>{workoutsData=[]; localStorage.setItem('day3_1hr', JSON.stringify(workoutsData)); renderWorkouts();});
 </script>
 </body>
