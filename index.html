@@ -6,192 +6,239 @@ index.html
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobile Gym Tracker</title>
+<title>Workout Tracker</title>
 <style>
-  body { font-family: Arial; background:#f4f4f4; margin:0; padding:0; }
-  h1 { text-align:center; margin:15px 0; font-size:1.5em; }
-  .tabs { display:flex; flex-wrap:wrap; justify-content:center; gap:5px; padding:5px; }
-  .tab { flex:1 1 auto; padding:10px; background:#007bff; color:white; border:none; border-radius:5px; text-align:center; font-size:0.9em; cursor:pointer; }
-  .tab.active { background:#0056b3; font-weight:bold; }
-  #workout-form { display:flex; flex-wrap:wrap; gap:5px; padding:10px; background:white; position:sticky; top:0; z-index:100; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
-  input, select, button { flex:1 1 100%; padding:10px; font-size:1em; margin:2px 0; border-radius:5px; border:1px solid #ccc; }
-  button { background:#28a745; color:white; border:none; cursor:pointer; }
-  button:hover { background:#218838; }
-  ul { list-style:none; padding:0; margin:0; overflow-y:auto; max-height:calc(100vh - 200px); }
-  li { background:white; margin:5px 10px; border-left:5px solid #28a745; padding:10px; border-radius:5px; }
-  .exercise-name { font-weight:bold; font-size:1.1em; cursor:pointer; }
-  .session-meta { font-size:0.9em; color:#555; margin-left:10px; display:flex; justify-content:space-between; flex-wrap:wrap; }
-  .delete-btn { background:#dc3545; border:none; padding:3px 8px; color:white; border-radius:3px; cursor:pointer; font-size:0.8em; }
-  .delete-btn:hover { background:#c82333; }
-  #clear-btn { width:90%; margin:10px auto; display:block; background:#007bff; padding:10px; border-radius:5px; font-size:1em; }
-  .session-list { margin-top:5px; }
-  .collapsed .session-list { display:none; }
+body { font-family: Arial, sans-serif; background:#f4f4f4; margin:0; padding:20px; }
+h1{text-align:center;margin-bottom:20px;}
+.tabs{display:flex;flex-wrap:wrap;justify-content:center;margin-bottom:10px;gap:5px;}
+.tab{padding:10px 15px;background:#007bff;color:white;border:none;cursor:pointer;border-radius:4px 4px 0 0;}
+.tab.active{background:#0056b3;font-weight:bold;}
+#workout-form{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:20px;}
+input, select, button{padding:10px;font-size:16px;}
+button{cursor:pointer;}
+button.feedback-btn.active{font-weight:bold;}
+button:hover{opacity:0.9;}
+ul{list-style:none;padding:0;max-width:650px;margin:0 auto;}
+li{background:white;margin:5px 0;padding:10px;border-left:5px solid #28a745;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+.delete-btn{background:#dc3545;border:none;padding:5px 10px;color:white;cursor:pointer;margin-left:5px;}
+.delete-btn:hover{background:#c82333;}
+#clear-btn{display:block;margin:20px auto;background-color:#007bff;color:white;}
+.exercise-buttons{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:10px;}
+.exercise-buttons button{background:#17a2b8;color:white;border:none;border-radius:4px;padding:5px 10px;}
+.exercise-buttons button:hover{opacity:0.8;}
+.exercise-buttons button.active{background:#138496;font-weight:bold;}
 </style>
 </head>
 <body>
-<h1>Mobile Gym Tracker</h1>
+<h1>Workout Tracker</h1>
 
+<!-- Tabs -->
 <div class="tabs">
-  <button class="tab active" data-day="day1_1hr">Day 1 (1hr)</button>
-  <button class="tab" data-day="day2_1hr">Day 2 (1hr)</button>
-  <button class="tab" data-day="day3_1hr">Day 3 (1hr)</button>
-  <button class="tab" data-day="day1_lt1hr">Day 1 (&lt;1hr)</button>
-  <button class="tab" data-day="day2_lt1hr">Day 2 (&lt;1hr)</button>
-  <button class="tab" data-day="day3_lt1hr">Day 3 (&lt;1hr)</button>
-  <button class="tab" data-day="day1_2of2">Day 1 of 2</button>
-  <button class="tab" data-day="day2_2of2">Day 2 of 2</button>
+  <button class="tab active" data-day="day1">Day 1 (1hr)</button>
+  <button class="tab" data-day="day2">Day 2 (1hr)</button>
+  <button class="tab" data-day="day3">Day 3 (1hr)</button>
 </div>
 
+<!-- Exercise Buttons -->
+<div id="exercise-buttons-container" class="exercise-buttons"></div>
+
+<!-- Form -->
 <form id="workout-form">
-  <input type="text" id="exercise-input" placeholder="Exercise (e.g., Push-ups)" required>
-  <input type="number" id="reps-input" placeholder="Reps" min="1" required>
-  <input type="number" id="sets-input" placeholder="Sets" min="1" required>
-  <input type="number" id="weight-input" placeholder="Weight (lbs)" min="0" required>
+  <input type="text" id="exercise-input" placeholder="Exercise" required readonly>
+  <input type="number" id="weight-input" placeholder="Weight (lbs)" min="1">
+  <input type="number" id="reps-input" placeholder="Reps Completed" min="1" required>
+  <input type="number" id="sets-input" placeholder="Sets" min="1" required readonly>
+  <input type="text" id="rest-input" placeholder="Rest (sec)" readonly>
   <select id="side-input" required>
     <option value="">Single/Both</option>
-    <option value="Single Leg/Arm">Single Leg/Arm</option>
-    <option value="Bilateral">Both</option>
+    <option value="Unilateral">Unilateral</option>
+    <option value="Bilateral">Bilateral</option>
   </select>
   <select id="equip-input" required>
     <option value="">Equipment</option>
-    <option value="BB">Barbell (BB)</option>
-    <option value="KB">Kettlebell (KB)</option>
-    <option value="DB">Dumbbell (DB)</option>
-    <option value="BW">Bodyweight (BW)</option>
+    <option value="KB">KB</option>
+    <option value="BB">BB</option>
+    <option value="DB">DB</option>
   </select>
+  <div>
+    <button type="button" class="feedback-btn" data-feedback="Easy">Easy</button>
+    <button type="button" class="feedback-btn" data-feedback="Stay">Stay</button>
+    <button type="button" class="feedback-btn" data-feedback="Hard">Hard</button>
+  </div>
   <button type="submit">Add Session</button>
 </form>
 
+<!-- Workout List -->
 <ul id="workout-list"></ul>
 <button id="clear-btn">Clear All Sessions for This Day</button>
 
 <script>
+// Workout templates
+const workoutsTemplate = {
+  day1: [
+    {exercise:"Squat", sets:3, reps:"12-15", rest:"120-180"},
+    {exercise:"RDL", sets:3, reps:"6-8", rest:"90"},
+    {exercise:"Incline DB Press", sets:3, reps:"6-8", rest:"75-90"},
+    {exercise:"Row", sets:3, reps:"8-10", rest:"75-90"},
+    {exercise:"Plank", sets:2, reps:"60 sec", rest:"60"}
+  ],
+  day2: [
+    {exercise:"Pull-Ups or Lat Pulldown", sets:4, reps:"AMAP", rest:"90-120"},
+    {exercise:"DB Bench", sets:3, reps:"8-10", rest:"120"},
+    {exercise:"Bulgarian Split Squat", sets:3, reps:"8 per leg", rest:"60"},
+    {exercise:"Hamstring Curl", sets:3, reps:"10-12", rest:"60"},
+    {exercise:"Face Pulls", sets:2, reps:"12-15", rest:"60"}
+  ],
+  day3: [
+    {exercise:"Squat", sets:3, reps:"8-10", rest:"90"},
+    {exercise:"Hip Thrust or Glute Bridge", sets:3, reps:"8-12", rest:"90"},
+    {exercise:"DB Row", sets:3, reps:"8-10", rest:"90"},
+    {exercise:"Incline DB Press", sets:3, reps:"8-10", rest:"75-90"},
+    {exercise:"Bi/Tri Superset - EZ Bar Curl", sets:2, reps:"10-12", rest:"60"},
+    {exercise:"Bi/Tri Superset - DB Curl", sets:2, reps:"10-12", rest:"60"},
+    {exercise:"Bi/Tri Superset - Rope Pull Down", sets:2, reps:"10-12", rest:"60"},
+    {exercise:"Bi/Tri Superset - Overhead Extension", sets:2, reps:"10-12", rest:"60"}
+  ]
+};
+
+let currentDay = 'day1';
+let workoutsData = JSON.parse(localStorage.getItem('workoutsData')) || JSON.parse(JSON.stringify(workoutsTemplate));
+
+// Track last selected exercise per day
+let lastSelectedExercise = {day1:null, day2:null, day3:null};
+
+// Elements
 const tabs = document.querySelectorAll('.tab');
+const exerciseButtonsContainer = document.getElementById('exercise-buttons-container');
 const form = document.getElementById('workout-form');
 const exerciseInput = document.getElementById('exercise-input');
+const weightInput = document.getElementById('weight-input');
 const repsInput = document.getElementById('reps-input');
 const setsInput = document.getElementById('sets-input');
-const weightInput = document.getElementById('weight-input');
+const restInput = document.getElementById('rest-input');
 const sideInput = document.getElementById('side-input');
 const equipInput = document.getElementById('equip-input');
 const list = document.getElementById('workout-list');
 const clearBtn = document.getElementById('clear-btn');
+const feedbackBtns = document.querySelectorAll('.feedback-btn');
 
-let currentDay = 'day1_1hr';
-let workoutsData = {};
+// Render exercise buttons
+function renderExerciseButtons() {
+  exerciseButtonsContainer.innerHTML = '';
+  const exercises = workoutsTemplate[currentDay];
+  exercises.forEach(ex=>{
+    const btn = document.createElement('button');
+    btn.classList.add('exercise-btn');
+    btn.textContent = ex.exercise;
+    btn.dataset.ex = ex.exercise;
 
-// Load saved data
-if(localStorage.getItem('workoutsData')) {
-  workoutsData = JSON.parse(localStorage.getItem('workoutsData'));
+    if(lastSelectedExercise[currentDay]===ex.exercise) btn.classList.add('active');
+
+    btn.addEventListener('click', ()=>{
+      applyToForm(ex);
+      document.querySelectorAll('.exercise-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      lastSelectedExercise[currentDay] = ex.exercise;
+    });
+
+    exerciseButtonsContainer.appendChild(btn);
+  });
 }
 
-// Helper: get last session for an exercise across all days
-function getLastSession(exerciseName) {
-  let lastSession = null;
-  for(const day in workoutsData) {
-    if(workoutsData[day][exerciseName]) {
-      const sessions = workoutsData[day][exerciseName];
-      const latest = sessions[sessions.length - 1];
-      if(!lastSession || latest.timestamp > lastSession.timestamp) {
-        lastSession = latest;
-      }
-    }
+// Apply session data to form
+function applyToForm(session){
+  exerciseInput.value = session.exercise;
+  setsInput.value = session.sets;
+  repsInput.value = session.reps;
+  restInput.value = session.rest;
+
+  const lastSession = (workoutsData[currentDay].find(s=>s.exercise===session.exercise)||{});
+  sideInput.value = lastSession.side||'';
+  equipInput.value = lastSession.equipment||'';
+  weightInput.value = lastSession.weight||'';
+
+  feedbackBtns.forEach(b=>b.classList.remove('active'));
+  if(lastSession.feedback){
+    document.querySelector(`.feedback-btn[data-feedback="${lastSession.feedback}"]`)?.classList.add('active');
   }
-  return lastSession;
 }
 
-// Render sessions
-function renderWorkouts() {
+// Render workouts list
+function renderWorkouts(){
   list.innerHTML = '';
-  const sessionsByExercise = workoutsData[currentDay] || {};
-  for(const exercise in sessionsByExercise) {
-    const exerciseLi = document.createElement('li');
-    exerciseLi.classList.add('collapsed');
-    exerciseLi.innerHTML = `<div class="exercise-name">${exercise}</div><div class="session-list"></div>`;
-    const sessionList = exerciseLi.querySelector('.session-list');
-    
-    const exerciseSessions = sessionsByExercise[exercise];
-    exerciseSessions.forEach((s, idx) => {
-      const sessionDiv = document.createElement('div');
-      sessionDiv.classList.add('session-meta');
-      sessionDiv.innerHTML = `${s.sets}x${s.reps} | ${s.side} | ${s.equipment} | ${s.weight} lbs 
-        <button class="delete-btn">Delete</button>`;
-      sessionDiv.querySelector('button').addEventListener('click', () => {
-        exerciseSessions.splice(idx,1);
-        if(exerciseSessions.length===0) delete sessionsByExercise[exercise];
-        localStorage.setItem('workoutsData', JSON.stringify(workoutsData));
-        renderWorkouts();
-      });
-      sessionList.appendChild(sessionDiv);
+  const sessions = workoutsData[currentDay] || [];
+  sessions.forEach((session,index)=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<strong>${session.exercise}</strong> - ${session.sets} sets x ${session.reps} reps | Rest: ${session.rest} sec
+      <div>${session.side||''} | ${session.equipment||''} | ${session.weight||''} | ${session.feedback||''}</div>`;
+    const delBtn = document.createElement('button');
+    delBtn.textContent='Delete';
+    delBtn.classList.add('delete-btn');
+    delBtn.addEventListener('click',()=>{
+      workoutsData[currentDay].splice(index,1);
+      localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
+      renderWorkouts();
     });
-
-    // Toggle collapse
-    exerciseLi.querySelector('.exercise-name').addEventListener('click', () => {
-      exerciseLi.classList.toggle('collapsed');
-    });
-
-    list.appendChild(exerciseLi);
-  }
+    li.appendChild(delBtn);
+    list.appendChild(li);
+  });
 }
-
-// Auto-fill last session across all days
-exerciseInput.addEventListener('input', () => {
-  const exercise = exerciseInput.value.trim();
-  const lastSession = getLastSession(exercise);
-  if(lastSession) {
-    repsInput.value = lastSession.reps;
-    setsInput.value = lastSession.sets;
-    weightInput.value = lastSession.weight;
-    sideInput.value = lastSession.side;
-    equipInput.value = lastSession.equipment;
-  } else {
-    repsInput.value = '';
-    setsInput.value = '';
-    weightInput.value = '';
-    sideInput.value = '';
-    equipInput.value = '';
-  }
-});
-
-// Add new session
-form.addEventListener('submit', e => {
-  e.preventDefault();
-  const exercise = exerciseInput.value.trim();
-  const reps = parseInt(repsInput.value);
-  const sets = parseInt(setsInput.value);
-  const weight = parseInt(weightInput.value);
-  const side = sideInput.value;
-  const equipment = equipInput.value;
-
-  if(exercise && reps > 0 && sets > 0 && !isNaN(weight) && side && equipment) {
-    if(!workoutsData[currentDay]) workoutsData[currentDay] = {};
-    if(!workoutsData[currentDay][exercise]) workoutsData[currentDay][exercise] = [];
-    workoutsData[currentDay][exercise].push({reps, sets, side, equipment, weight, timestamp: Date.now()});
-    localStorage.setItem('workoutsData', JSON.stringify(workoutsData));
-    renderWorkouts();
-    form.reset();
-  }
-});
 
 // Tab switching
-tabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    tabs.forEach(t => t.classList.remove('active'));
+tabs.forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    tabs.forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     currentDay = tab.dataset.day;
+    renderExerciseButtons();
     renderWorkouts();
+
+    const lastEx = lastSelectedExercise[currentDay];
+    const sessionToFill = workoutsTemplate[currentDay].find(s=>s.exercise===lastEx) || workoutsTemplate[currentDay][0];
+    applyToForm(sessionToFill);
   });
 });
 
-// Clear day
-clearBtn.addEventListener('click', () => {
-  workoutsData[currentDay] = {};
-  localStorage.setItem('workoutsData', JSON.stringify(workoutsData));
+// Feedback buttons
+feedbackBtns.forEach(b=>{
+  b.addEventListener('click',()=>{
+    feedbackBtns.forEach(btn=>btn.classList.remove('active'));
+    b.classList.add('active');
+  });
+});
+
+// Add session
+form.addEventListener('submit',(e)=>{
+  e.preventDefault();
+  const session={
+    exercise:exerciseInput.value,
+    reps:repsInput.value,
+    sets:setsInput.value,
+    rest:restInput.value,
+    side:sideInput.value,
+    equipment:equipInput.value,
+    weight:weightInput.value,
+    feedback:document.querySelector('.feedback-btn.active')?.dataset.feedback||''
+  };
+  if(!workoutsData[currentDay]) workoutsData[currentDay]=[];
+  workoutsData[currentDay].push(session);
+  localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
+  renderWorkouts();
+  repsInput.value='';
+  weightInput.value='';
+});
+
+// Clear button
+clearBtn.addEventListener('click',()=>{
+  workoutsData[currentDay]=[];
+  localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
   renderWorkouts();
 });
 
-// Initial render
+// Initial load
+renderExerciseButtons();
 renderWorkouts();
+applyToForm(workoutsTemplate[currentDay][0]);
 </script>
 </body>
 </html>
