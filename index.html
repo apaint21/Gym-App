@@ -40,6 +40,7 @@ li.highlight { background-color: #e0f7fa; }
 
 <form id="workout-form">
 <select id="exercise-input" required></select>
+<span id="rest-display" style="margin-left:10px; font-weight:bold;"></span>
 <input type="number" id="reps-input" placeholder="Reps Completed" min="1" required>
 <input type="number" id="sets-input" placeholder="Sets" min="1" required readonly>
 <select id="side-input" required>
@@ -77,6 +78,7 @@ const equipInput = document.getElementById('equip-input');
 const moodInput = document.getElementById('mood-input');
 const list = document.getElementById('workout-list');
 const clearBtn = document.getElementById('clear-btn');
+const restDisplay = document.getElementById('rest-display');
 let currentDay = 'day1_1hr';
 let workoutsData = {};
 
@@ -105,7 +107,11 @@ function populateExerciseDropdown() {
     opt.textContent = ex.name;
     exerciseInput.appendChild(opt);
   });
-  setsInput.value = exercises[0].sets; // auto-fill sets
+
+  const firstEx = exercises[0];
+  setsInput.value = firstEx.sets;
+  restDisplay.textContent = `Rest: ${firstEx.rest}`;
+
   renderWorkouts();
   highlightSelectedExercise();
 }
@@ -152,6 +158,15 @@ function highlightSelectedExercise() {
   });
 }
 
+// Update sets and rest display when dropdown changes
+exerciseInput.addEventListener('change', () => {
+  const selectedEx = preloadedExercises[currentDay].find(ex => ex.name === exerciseInput.value);
+  setsInput.value = selectedEx ? selectedEx.sets : '';
+  restDisplay.textContent = selectedEx ? `Rest: ${selectedEx.rest}` : '';
+  renderWorkouts();
+  highlightSelectedExercise();
+});
+
 // Initial setup
 populateExerciseDropdown();
 renderWorkouts();
@@ -190,7 +205,5 @@ clearBtn.addEventListener('click',()=>{
   renderWorkouts();
 });
 </script>
-</body>
-</html>
 </body>
 </html>
