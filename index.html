@@ -6,77 +6,65 @@ index.html
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workout Tracker - Full Sessions</title>
+<title>Workout Tracker - Day 3 (1hr)</title>
 <style>
-body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
 h1 { text-align: center; margin-bottom: 20px; }
-.tabs { display: flex; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; gap: 5px; }
-.tab { padding: 10px 15px; background-color: #007bff; color: white; border: none; cursor: pointer; border-radius: 4px 4px 0 0; }
-.tab.active { background-color: #0056b3; font-weight: bold; }
-#workout-form { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; align-items:center; }
+#workout-form { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
 input, select, button { padding: 10px; font-size: 16px; }
+input[readonly] { background-color: #e9ecef; }
 button { cursor: pointer; background-color: #28a745; color: white; border: none; }
 button:hover { background-color: #218838; }
 ul { list-style: none; padding: 0; max-width: 650px; margin: 0 auto; }
-li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28a745; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; transition: background 0.2s; }
-li.highlight { background-color: #e0f7fa; }
+li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28a745; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
 .delete-btn { background-color: #dc3545; border: none; padding: 5px 10px; color: white; cursor: pointer; margin-left: 5px; }
 .delete-btn:hover { background-color: #c82333; }
-#clear-btn { display:block; margin: 20px auto; background-color:#007bff; }
 .session-info { flex: 1; margin-right: 10px; }
 .session-meta { font-size: 0.9em; color: #555; }
-#history-display { font-size: 0.85em; color: #555; margin-left:10px; margin-top:3px; }
+.history { font-size: 0.8em; color: #888; margin-top: 5px; }
 </style>
 </head>
 <body>
-<h1>Workout Tracker</h1>
-<div class="tabs">
-<button class="tab active" data-day="day1_1hr">Day 1 (1hr)</button>
-<button class="tab" data-day="day2_1hr">Day 2 (1hr)</button>
-<button class="tab" data-day="day3_1hr">Day 3 (1hr)</button>
-<button class="tab" data-day="day1_lt1hr">Day 1 (&lt;1hr)</button>
-<button class="tab" data-day="day2_lt1hr">Day 2 (&lt;1hr)</button>
-<button class="tab" data-day="day3_lt1hr">Day 3 (&lt;1hr)</button>
-</div>
+<h1>Day 3 (1hr) Workout</h1>
 
 <form id="workout-form">
-<select id="exercise-input" required></select>
-<span id="rest-display" style="margin-left:10px; font-weight:bold;"></span>
-<div id="history-display"></div>
-
-<div style="display:flex; gap:10px; align-items:center;">
-  <input type="number" id="sets-input" placeholder="Sets" min="1" required readonly style="width:70px;">
-  <input type="number" id="reps-input" placeholder="Reps Completed" min="1" required style="width:120px;">
-  <input type="number" id="weight-input" placeholder="Weight Used" min="0" style="width:120px;">
-</div>
-
-<select id="side-input" required>
-<option value="">Single/Both</option>
-<option value="Single Leg/Arm">Single Leg/Arm</option>
-<option value="Bilateral">Both</option>
-</select>
-<select id="equip-input" required>
-<option value="">Equipment</option>
-<option value="BB">Barbell (BB)</option>
-<option value="DB">Dumbbell (DB)</option>
-<option value="KB">Kettlebell (KB)</option>
-<option value="BW">Bodyweight (BW)</option>
-</select>
-<select id="mood-input" required>
-<option value="">Mood</option>
-<option value="Easy">Easy</option>
-<option value="Stay">Stay</option>
-<option value="Hard">Hard</option>
-</select>
-<button type="submit">Add Session</button>
+  <select id="exercise-input" required></select>
+  <input type="number" id="reps-input" placeholder="Reps Completed" min="1" required>
+  <input type="number" id="sets-input" placeholder="Sets" readonly>
+  <input type="number" id="weight-input" placeholder="Weight Used">
+  <select id="side-input" required>
+    <option value="">Single/Both</option>
+    <option value="Single Leg/Arm">Single Leg/Arm</option>
+    <option value="Bilateral">Both</option>
+  </select>
+  <select id="equip-input" required>
+    <option value="">Equipment</option>
+    <option value="BB">Barbell (BB)</option>
+    <option value="DB">Dumbbell (DB)</option>
+    <option value="KB">Kettlebell (KB)</option>
+    <option value="BW">Bodyweight (BW)</option>
+  </select>
+  <select id="mood-input" required>
+    <option value="">Mood</option>
+    <option value="Easy">Easy</option>
+    <option value="Stay">Stay</option>
+    <option value="Hard">Hard</option>
+  </select>
+  <button type="submit">Add Session</button>
 </form>
 
+<!-- Superset dropdowns -->
+<div id="superset-container" style="display:none; gap:10px; margin-bottom:15px;">
+  <select id="sub1-select"></select>
+  <div id="sub1-history" class="history"></div>
+  <select id="sub2-select"></select>
+  <div id="sub2-history" class="history"></div>
+</div>
+
 <ul id="workout-list"></ul>
-<button id="clear-btn">Clear All Sessions for This Day</button>
+<button id="clear-btn">Clear All Sessions for Day 3 (1hr)</button>
 
 <script>
-const tabs = document.querySelectorAll('.tab');
-const form = document.getElementById('workout-form');
 const exerciseInput = document.getElementById('exercise-input');
 const repsInput = document.getElementById('reps-input');
 const setsInput = document.getElementById('sets-input');
@@ -86,202 +74,135 @@ const equipInput = document.getElementById('equip-input');
 const moodInput = document.getElementById('mood-input');
 const list = document.getElementById('workout-list');
 const clearBtn = document.getElementById('clear-btn');
-const restDisplay = document.getElementById('rest-display');
-const historyDisplay = document.getElementById('history-display');
-let currentDay = 'day1_1hr';
-let workoutsData = {};
+const supersetContainer = document.getElementById('superset-container');
+const sub1Select = document.getElementById('sub1-select');
+const sub2Select = document.getElementById('sub2-select');
+const sub1History = document.getElementById('sub1-history');
+const sub2History = document.getElementById('sub2-history');
 
-// Preloaded exercises for all tabs
-const preloadedExercises = {
-  day1_1hr: [
-    { name: 'Squat', sets: 3, reps: '12-15', rest: '2-3 min', type:'normal' },
-    { name: 'RDL', sets: 3, reps: '6-8', rest: '90 sec', type:'normal' },
-    { name: 'Incline DB Press', sets: 3, reps: '6-8', rest: '75-90 sec', type:'normal' },
-    { name: 'Row', sets: 3, reps: '8-10', rest: '75-90 sec', type:'normal' },
-    { name: 'Plank', sets: 2, reps: '60 sec', rest: '', type:'normal' }
-  ],
-  day2_1hr: [
-    { name: 'Pull-Ups or Lat Pulldown', sets: 4, reps: 'AMAP', rest: '90-120 sec', type:'normal' },
-    { name: 'DB Bench', sets: 3, reps: '8-10', rest: '120 sec', type:'normal' },
-    { name: 'Bulgarian Split Squat', sets: 3, reps: '8 / leg', rest: '60 sec', type:'normal' },
-    { name: 'Hamstring Curl', sets: 2, reps: '10-12', rest: '60 sec', type:'normal' },
-    { name: 'Face Pulls', sets: 2, reps: '12-15', rest: '60 sec', type:'normal' }
-  ],
-  day3_1hr: [
-    { name: 'Squat', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
-    { name: 'Hip Thrust or Glute Bridge', sets: 3, reps: '8-12', rest: '90 sec', type:'normal' },
-    { name: 'DB Row', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
-    { name: 'Incline DB Press', sets: 3, reps: '8-10', rest: '75-90 sec', type:'normal' },
-    { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', type:'superset', subExercises: [
-      { name: 'Ez Bar Curl', lastWeight: '', reps: '' },
-      { name: 'DB Curl', lastWeight: '', reps: '' },
+let workoutsData = JSON.parse(localStorage.getItem('day3_1hr')) || [];
+
+const exercises = [
+  { name: 'Squat', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
+  { name: 'Hip Thrust or Glute Bridge', sets: 3, reps: '8-12', rest: '90 sec', type:'normal' },
+  { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', type:'superset', subExercises: [
+      { name: 'EZ Bar Curl', lastWeight: '', reps: '' },
       { name: 'Rope Pushdown', lastWeight: '', reps: '' },
+      { name: 'DB Curl', lastWeight: '', reps: '' },
       { name: 'Overhead Extension', lastWeight: '', reps: '' }
-    ]}
-  ],
-  day1_lt1hr: [
-    { name: 'Squat', sets: 3, reps: '12-15', rest: '120 sec', type:'normal' },
-    { name: 'Chest/Back Superset', sets: 3, reps: '6-10', rest: '60-75 sec', type:'superset', subExercises:[
-      {name:'Incline Press', sets:3, reps:'6-8'},
-      {name:'Row', sets:3, reps:'8-10'}
-    ]},
-    { name: 'RDL', sets: 3, reps: '6-8', rest: '75-90 sec', type:'normal' },
-    { name: 'Plank', sets: 2, reps: '60', rest: '', type:'normal' }
-  ],
-  day2_lt1hr: [
-    { name: 'Pull-Ups or Lat Pulldown', sets: 4, reps: 'AMAP', rest:'', type:'normal' },
-    { name: 'Superset', sets:3, reps:'8-15', rest:'60 sec', type:'superset', subExercises:[
-      {name:'Bench', sets:3, reps:'8-10'},
-      {name:'Face Pulls', sets:3, reps:'12-15'}
-    ]},
-    { name: 'Bulgarian Split Squat', sets:3, reps:'8', rest:'60 sec', type:'normal'},
-    { name: 'Hamstring Curl', sets:2, reps:'10-12', rest:'90 sec', type:'normal'}
-  ],
-  day3_lt1hr: [
-    { name: 'Squat', sets:3, reps:'8-10', rest:'90 sec', type:'normal' },
-    { name: 'Hip Thrust or Glute Bridge', sets:3, reps:'8-12', rest:'90 sec', type:'normal' },
-    { name: 'Chest/Back Superset', sets:3, reps:'8-10', rest:'60 sec', type:'superset', subExercises:[
-      {name:'Row', sets:3, reps:'8-10'},
-      {name:'Incline Press', sets:3, reps:'8-10'}
-    ]},
-    { name: 'Bi/Tri Superset', sets:2, reps:'10-12', rest:'60 sec', type:'superset', subExercises:[
-      {name:'EZ Bar Curl', sets:2, reps:'10-12'},
-      {name:'DB Curl', sets:2, reps:'10-12'},
-      {name:'Rope Pushdown', sets:2, reps:'10-12'},
-      {name:'Overhead Extension', sets:2, reps:'10-12'}
-    ]}
-  ]
-};
+  ]},
+];
 
-// Load saved workouts from localStorage
-if(localStorage.getItem('workoutsData')) {
-  workoutsData = JSON.parse(localStorage.getItem('workoutsData'));
-}
-
-// Populate dropdown
 function populateExerciseDropdown() {
   exerciseInput.innerHTML = '';
-  const exercises = preloadedExercises[currentDay];
   exercises.forEach(ex => {
     const opt = document.createElement('option');
     opt.value = ex.name;
     opt.textContent = ex.name;
     exerciseInput.appendChild(opt);
   });
-
-  const firstEx = exercises[0];
-  setsInput.value = firstEx.sets;
-  restDisplay.textContent = `Rest: ${firstEx.rest}`;
-
-  renderWorkouts();
-  highlightSelectedExercise();
-  updateHistory();
 }
+populateExerciseDropdown();
 
-// Update history line
-function updateHistory() {
-  const sessions = workoutsData[currentDay] || [];
-  const lastSession = [...sessions].reverse().find(s => s.exercise === exerciseInput.value);
-  if(lastSession){
-    historyDisplay.textContent = `Last: ${lastSession.sets} sets x ${lastSession.reps} reps | Weight: ${lastSession.weight} | ${lastSession.side} | ${lastSession.equipment} | Mood: ${lastSession.mood}`;
-  } else {
-    historyDisplay.textContent = '';
-  }
-}
-
-// Render all workouts
 function renderWorkouts() {
   list.innerHTML = '';
-  const sessions = workoutsData[currentDay] || [];
-
-  preloadedExercises[currentDay].forEach(ex => {
+  workoutsData.forEach((session, index) => {
     const li = document.createElement('li');
-    li.innerHTML = `<div class="session-info"><strong>${ex.name}</strong> - ${ex.sets} sets x ${ex.reps} reps<div class="session-meta">Rest: ${ex.rest}</div></div>`;
-    list.appendChild(li);
-  });
-
-  sessions.forEach((session,index) => {
-    const li = document.createElement('li');
-    li.innerHTML = `<div class="session-info"><strong>${session.exercise}</strong> - ${session.sets} sets x ${session.reps} reps | Weight: ${session.weight}<div class="session-meta">${session.side} | ${session.equipment} | Mood: ${session.mood}</div></div>`;
+    li.innerHTML = `<div class="session-info"><strong>${session.exercise}</strong> - ${session.sets} sets x ${session.reps} reps @ ${session.weight} ${session.side} | ${session.equipment} | Mood: ${session.mood}</div>`;
     const delBtn = document.createElement('button');
     delBtn.textContent = 'Delete';
     delBtn.classList.add('delete-btn');
     delBtn.addEventListener('click',()=>{
-      workoutsData[currentDay].splice(index,1);
-      localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
+      workoutsData.splice(index,1);
+      localStorage.setItem('day3_1hr', JSON.stringify(workoutsData));
       renderWorkouts();
-      highlightSelectedExercise();
-      updateHistory();
     });
     li.appendChild(delBtn);
     list.appendChild(li);
   });
-
-  highlightSelectedExercise();
-  updateHistory();
 }
-
-// Highlight selected exercise in the list
-function highlightSelectedExercise() {
-  const items = list.querySelectorAll('li');
-  items.forEach(li => {
-    if(li.querySelector('strong').textContent === exerciseInput.value) {
-      li.classList.add('highlight');
-    } else {
-      li.classList.remove('highlight');
-    }
-  });
-}
-
-// Exercise change
-exerciseInput.addEventListener('change', () => {
-  const selectedEx = preloadedExercises[currentDay].find(ex => ex.name === exerciseInput.value);
-  setsInput.value = selectedEx ? selectedEx.sets : '';
-  restDisplay.textContent = selectedEx ? `Rest: ${selectedEx.rest}` : '';
-  renderWorkouts();
-  highlightSelectedExercise();
-  updateHistory();
-});
-
-// Initial setup
-populateExerciseDropdown();
 renderWorkouts();
 
-// Form submit
-form.addEventListener('submit', e => {
+exerciseInput.addEventListener('change', ()=>{
+  const ex = exercises.find(e => e.name === exerciseInput.value);
+  setsInput.value = ex.sets;
+  
+  if(ex.type==='superset'){
+    supersetContainer.style.display='flex';
+    // populate sub1 and sub2
+    sub1Select.innerHTML='';
+    sub2Select.innerHTML='';
+    ['EZ Bar Curl','Rope Pushdown'].forEach(name=>{
+      const o = document.createElement('option'); o.value=name; o.textContent=name; sub1Select.appendChild(o);
+    });
+    ['DB Curl','Overhead Extension'].forEach(name=>{
+      const o = document.createElement('option'); o.value=name; o.textContent=name; sub2Select.appendChild(o);
+    });
+    sub1History.textContent='';
+    sub2History.textContent='';
+  } else {
+    supersetContainer.style.display='none';
+  }
+});
+
+function updateHistory(selectElem, historyElem){
+  const last = workoutsData.slice().reverse().find(s=>s.exercise===selectElem.value);
+  if(last){
+    historyElem.textContent = `Last: ${last.reps} reps @ ${last.weight} ${last.side} | ${last.equipment} | Mood: ${last.mood}`;
+  } else {
+    historyElem.textContent='';
+  }
+}
+
+sub1Select.addEventListener('change',()=> updateHistory(sub1Select, sub1History));
+sub2Select.addEventListener('change',()=> updateHistory(sub2Select, sub2History));
+
+form.addEventListener('submit', e=>{
   e.preventDefault();
-  const exercise = exerciseInput.value;
-  const reps = repsInput.value;
-  const sets = setsInput.value;
-  const weight = weightInput.value;
-  const side = sideInput.value;
-  const equipment = equipInput.value;
-  const mood = moodInput.value;
-  if(!workoutsData[currentDay]) workoutsData[currentDay]=[];
-  workoutsData[currentDay].push({exercise,reps,sets,weight,side,equipment,mood});
-  localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
+  let exerciseName = exerciseInput.value;
+  if(exerciseName==='Bi/Tri Superset'){
+    // log sub1
+    workoutsData.push({
+      exercise: sub1Select.value,
+      sets: setsInput.value,
+      reps: repsInput.value,
+      weight: weightInput.value,
+      side: sideInput.value,
+      equipment: equipInput.value,
+      mood: moodInput.value
+    });
+    // log sub2
+    workoutsData.push({
+      exercise: sub2Select.value,
+      sets: setsInput.value,
+      reps: repsInput.value,
+      weight: weightInput.value,
+      side: sideInput.value,
+      equipment: equipInput.value,
+      mood: moodInput.value
+    });
+  } else {
+    workoutsData.push({
+      exercise: exerciseName,
+      sets: setsInput.value,
+      reps: repsInput.value,
+      weight: weightInput.value,
+      side: sideInput.value,
+      equipment: equipInput.value,
+      mood: moodInput.value
+    });
+  }
+  localStorage.setItem('day3_1hr', JSON.stringify(workoutsData));
   renderWorkouts();
   form.reset();
-  updateHistory();
+  setsInput.value = exercises.find(e=>e.name===exerciseInput.value).sets;
+  supersetContainer.style.display='none';
 });
 
-// Tab switching
-tabs.forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    tabs.forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    currentDay=tab.dataset.day;
-    populateExerciseDropdown();
-    renderWorkouts();
-  });
-});
-
-// Clear day sessions
-clearBtn.addEventListener('click',()=>{
-  workoutsData[currentDay]=[];
-  localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
+clearBtn.addEventListener('click', ()=>{
+  workoutsData=[];
+  localStorage.setItem('day3_1hr', JSON.stringify(workoutsData));
   renderWorkouts();
-  updateHistory();
 });
 </script>
 </body>
