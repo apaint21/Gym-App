@@ -10,7 +10,7 @@ index.html
 <style>
 body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
 h1 { text-align: center; margin-bottom: 20px; }
-#workout-form { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
+#workout-form { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
 input, select, button { padding: 10px; font-size: 16px; }
 input[readonly] { background-color: #e9ecef; }
 button { cursor: pointer; background-color: #28a745; color: white; border: none; }
@@ -22,6 +22,7 @@ li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28
 .session-info { flex: 1; margin-right: 10px; }
 .session-meta { font-size: 0.9em; color: #555; }
 .history { font-size: 0.8em; color: #888; margin-top: 5px; }
+.sub-exercise { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 </style>
 </head>
 <body>
@@ -29,56 +30,98 @@ li { background: white; margin: 5px 0; padding: 10px; border-left: 5px solid #28
 
 <form id="workout-form">
   <select id="exercise-input" required></select>
-  <input type="number" id="reps-input" placeholder="Reps Completed" min="1" required>
-  <input type="number" id="sets-input" placeholder="Sets" readonly>
-  <input type="number" id="weight-input" placeholder="Weight Used">
-  <select id="side-input" required>
-    <option value="">Single/Both</option>
-    <option value="Single Leg/Arm">Single Leg/Arm</option>
-    <option value="Bilateral">Both</option>
-  </select>
-  <select id="equip-input" required>
-    <option value="">Equipment</option>
-    <option value="BB">Barbell (BB)</option>
-    <option value="DB">Dumbbell (DB)</option>
-    <option value="KB">Kettlebell (KB)</option>
-    <option value="BW">Bodyweight (BW)</option>
-  </select>
-  <select id="mood-input" required>
-    <option value="">Mood</option>
-    <option value="Easy">Easy</option>
-    <option value="Stay">Stay</option>
-    <option value="Hard">Hard</option>
-  </select>
+  
+  <div id="normal-inputs">
+    <input type="number" id="reps-input" placeholder="Reps Completed" min="1">
+    <input type="number" id="sets-input" placeholder="Sets" readonly>
+    <input type="number" id="weight-input" placeholder="Weight Used">
+    <select id="side-input">
+      <option value="">Single/Both</option>
+      <option value="Single Leg/Arm">Single Leg/Arm</option>
+      <option value="Bilateral">Both</option>
+    </select>
+    <select id="equip-input">
+      <option value="">Equipment</option>
+      <option value="BB">Barbell (BB)</option>
+      <option value="DB">Dumbbell (DB)</option>
+      <option value="KB">Kettlebell (KB)</option>
+      <option value="BW">Bodyweight (BW)</option>
+    </select>
+    <select id="mood-input">
+      <option value="">Mood</option>
+      <option value="Easy">Easy</option>
+      <option value="Stay">Stay</option>
+      <option value="Hard">Hard</option>
+    </select>
+  </div>
+
+  <!-- Superset container with independent inputs for each sub-exercise -->
+  <div id="superset-container" style="display:none; flex-direction: column; gap:10px;">
+    
+    <div class="sub-exercise">
+      <strong>Sub-Exercise 1</strong>
+      <select id="sub1-select"></select>
+      <input type="number" id="sub1-reps" placeholder="Reps">
+      <input type="number" id="sub1-weight" placeholder="Weight">
+      <select id="sub1-side">
+        <option value="">Single/Both</option>
+        <option value="Single Leg/Arm">Single Leg/Arm</option>
+        <option value="Bilateral">Both</option>
+      </select>
+      <select id="sub1-equip">
+        <option value="">Equipment</option>
+        <option value="BB">Barbell (BB)</option>
+        <option value="DB">Dumbbell (DB)</option>
+        <option value="KB">Kettlebell (KB)</option>
+        <option value="BW">Bodyweight (BW)</option>
+      </select>
+      <select id="sub1-mood">
+        <option value="">Mood</option>
+        <option value="Easy">Easy</option>
+        <option value="Stay">Stay</option>
+        <option value="Hard">Hard</option>
+      </select>
+      <div id="sub1-history" class="history"></div>
+    </div>
+
+    <div class="sub-exercise">
+      <strong>Sub-Exercise 2</strong>
+      <select id="sub2-select"></select>
+      <input type="number" id="sub2-reps" placeholder="Reps">
+      <input type="number" id="sub2-weight" placeholder="Weight">
+      <select id="sub2-side">
+        <option value="">Single/Both</option>
+        <option value="Single Leg/Arm">Single Leg/Arm</option>
+        <option value="Bilateral">Both</option>
+      </select>
+      <select id="sub2-equip">
+        <option value="">Equipment</option>
+        <option value="BB">Barbell (BB)</option>
+        <option value="DB">Dumbbell (DB)</option>
+        <option value="KB">Kettlebell (KB)</option>
+        <option value="BW">Bodyweight (BW)</option>
+      </select>
+      <select id="sub2-mood">
+        <option value="">Mood</option>
+        <option value="Easy">Easy</option>
+        <option value="Stay">Stay</option>
+        <option value="Hard">Hard</option>
+      </select>
+      <div id="sub2-history" class="history"></div>
+    </div>
+
+  </div>
+
   <button type="submit">Add Session</button>
 </form>
 
-<!-- Superset dropdowns -->
-<div id="superset-container" style="display:none; gap:10px; margin-bottom:15px;">
-  <select id="sub1-select"></select>
-  <div id="sub1-history" class="history"></div>
-  <select id="sub2-select"></select>
-  <div id="sub2-history" class="history"></div>
-</div>
-
 <ul id="workout-list"></ul>
-<button id="clear-btn">Clear All Sessions for Day 3 (1hr)</button>
+<button id="clear-btn">Clear All Sessions</button>
 
 <script>
+const form = document.getElementById('workout-form');
 const exerciseInput = document.getElementById('exercise-input');
-const repsInput = document.getElementById('reps-input');
 const setsInput = document.getElementById('sets-input');
-const weightInput = document.getElementById('weight-input');
-const sideInput = document.getElementById('side-input');
-const equipInput = document.getElementById('equip-input');
-const moodInput = document.getElementById('mood-input');
-const list = document.getElementById('workout-list');
-const clearBtn = document.getElementById('clear-btn');
-const supersetContainer = document.getElementById('superset-container');
-const sub1Select = document.getElementById('sub1-select');
-const sub2Select = document.getElementById('sub2-select');
-const sub1History = document.getElementById('sub1-history');
-const sub2History = document.getElementById('sub2-history');
 
 let workoutsData = JSON.parse(localStorage.getItem('day3_1hr')) || [];
 
@@ -86,124 +129,93 @@ const exercises = [
   { name: 'Squat', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
   { name: 'Hip Thrust or Glute Bridge', sets: 3, reps: '8-12', rest: '90 sec', type:'normal' },
   { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', type:'superset', subExercises: [
-      { name: 'EZ Bar Curl', lastWeight: '', reps: '' },
-      { name: 'DB Curl', lastWeight: '', reps: '' },
-      { name: 'Rope Pushdown', lastWeight: '', reps: '' },
-      { name: 'Overhead Extension', lastWeight: '', reps: '' }
-  ]},
+      { name: 'EZ Bar Curl' },
+      { name: 'DB Curl' },
+      { name: 'Rope Pushdown' },
+      { name: 'Overhead Extension' }
+  ]}
 ];
 
-function populateExerciseDropdown() {
-  exerciseInput.innerHTML = '';
-  exercises.forEach(ex => {
-    const opt = document.createElement('option');
-    opt.value = ex.name;
-    opt.textContent = ex.name;
+// Populate main exercise dropdown
+function populateExerciseDropdown(){
+  exerciseInput.innerHTML='';
+  exercises.forEach(ex=>{
+    const opt=document.createElement('option');
+    opt.value=ex.name;
+    opt.textContent=ex.name;
     exerciseInput.appendChild(opt);
   });
 }
 populateExerciseDropdown();
 
-function renderWorkouts() {
-  list.innerHTML = '';
-  workoutsData.forEach((session, index) => {
-    const li = document.createElement('li');
-    li.innerHTML = `<div class="session-info"><strong>${session.exercise}</strong> - ${session.sets} sets x ${session.reps} reps @ ${session.weight} ${session.side} | ${session.equipment} | Mood: ${session.mood}</div>`;
-    const delBtn = document.createElement('button');
-    delBtn.textContent = 'Delete';
+// Render workout history
+function renderWorkouts(){
+  const list=document.getElementById('workout-list');
+  list.innerHTML='';
+  workoutsData.forEach((s,i)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<div class="session-info"><strong>${s.exercise}</strong> - ${s.sets} sets x ${s.reps} reps @ ${s.weight} ${s.side} | ${s.equipment} | Mood: ${s.mood}</div>`;
+    const delBtn=document.createElement('button');
+    delBtn.textContent='Delete';
     delBtn.classList.add('delete-btn');
-    delBtn.addEventListener('click',()=>{
-      workoutsData.splice(index,1);
-      localStorage.setItem('day3_1hr', JSON.stringify(workoutsData));
-      renderWorkouts();
-    });
+    delBtn.addEventListener('click',()=>{workoutsData.splice(i,1); localStorage.setItem('day3_1hr', JSON.stringify(workoutsData)); renderWorkouts();});
     li.appendChild(delBtn);
     list.appendChild(li);
   });
 }
 renderWorkouts();
 
-exerciseInput.addEventListener('change', ()=>{
-  const ex = exercises.find(e => e.name === exerciseInput.value);
-  setsInput.value = ex.sets;
-  
+// Handle exercise change
+exerciseInput.addEventListener('change',()=>{
+  const ex=exercises.find(e=>e.name===exerciseInput.value);
+  setsInput.value=ex.sets;
   if(ex.type==='superset'){
-    supersetContainer.style.display='flex';
-    // populate sub1 and sub2
-    sub1Select.innerHTML='';
-    sub2Select.innerHTML='';
-    ['EZ Bar Curl','DB Curl'].forEach(name=>{
-      const o = document.createElement('option'); o.value=name; o.textContent=name; sub1Select.appendChild(o);
-    });
-    ['Rope Pushdown','Overhead Extension'].forEach(name=>{
-      const o = document.createElement('option'); o.value=name; o.textContent=name; sub2Select.appendChild(o);
-    });
-    sub1History.textContent='';
-    sub2History.textContent='';
+    document.getElementById('superset-container').style.display='flex';
+    // Populate sub-exercises
+    const sub1Select=document.getElementById('sub1-select');
+    const sub2Select=document.getElementById('sub2-select');
+    sub1Select.innerHTML=''; sub2Select.innerHTML='';
+    ['EZ Bar Curl','DB Curl'].forEach(n=>{const o=document.createElement('option'); o.value=n; o.textContent=n; sub1Select.appendChild(o);});
+    ['Rope Pushdown','Overhead Extension'].forEach(n=>{const o=document.createElement('option'); o.value=n; o.textContent=n; sub2Select.appendChild(o);});
+    updateHistory(sub1Select,'sub1-history'); updateHistory(sub2Select,'sub2-history');
+    document.getElementById('normal-inputs').style.display='none';
   } else {
-    supersetContainer.style.display='none';
+    document.getElementById('superset-container').style.display='none';
+    document.getElementById('normal-inputs').style.display='flex';
   }
 });
 
-function updateHistory(selectElem, historyElem){
-  const last = workoutsData.slice().reverse().find(s=>s.exercise===selectElem.value);
-  if(last){
-    historyElem.textContent = `Last: ${last.reps} reps @ ${last.weight} ${last.side} | ${last.equipment} | Mood: ${last.mood}`;
-  } else {
-    historyElem.textContent='';
-  }
+function updateHistory(selectElem,id){
+  const last=workoutsData.slice().reverse().find(s=>s.exercise===selectElem.value);
+  document.getElementById(id).textContent=last?`Last: ${last.reps} reps @ ${last.weight} ${last.side} | ${last.equipment} | Mood: ${last.mood}`:'';
 }
 
-sub1Select.addEventListener('change',()=> updateHistory(sub1Select, sub1History));
-sub2Select.addEventListener('change',()=> updateHistory(sub2Select, sub2History));
+// Update history on sub-exercise change
+document.getElementById('sub1-select').addEventListener('change',()=>updateHistory(document.getElementById('sub1-select'),'sub1-history'));
+document.getElementById('sub2-select').addEventListener('change',()=>updateHistory(document.getElementById('sub2-select'),'sub2-history'));
 
-form.addEventListener('submit', e=>{
+// Submit form
+form.addEventListener('submit',e=>{
   e.preventDefault();
-  let exerciseName = exerciseInput.value;
-  if(exerciseName==='Bi/Tri Superset'){
-    // log sub1
-    workoutsData.push({
-      exercise: sub1Select.value,
-      sets: setsInput.value,
-      reps: repsInput.value,
-      weight: weightInput.value,
-      side: sideInput.value,
-      equipment: equipInput.value,
-      mood: moodInput.value
-    });
-    // log sub2
-    workoutsData.push({
-      exercise: sub2Select.value,
-      sets: setsInput.value,
-      reps: repsInput.value,
-      weight: weightInput.value,
-      side: sideInput.value,
-      equipment: equipInput.value,
-      mood: moodInput.value
-    });
+  const exName=exerciseInput.value;
+  if(exName==='Bi/Tri Superset'){
+    const sub1={ exercise: document.getElementById('sub1-select').value, sets: setsInput.value, reps: document.getElementById('sub1-reps').value, weight: document.getElementById('sub1-weight').value, side: document.getElementById('sub1-side').value, equipment: document.getElementById('sub1-equip').value, mood: document.getElementById('sub1-mood').value };
+    const sub2={ exercise: document.getElementById('sub2-select').value, sets: setsInput.value, reps: document.getElementById('sub2-reps').value, weight: document.getElementById('sub2-weight').value, side: document.getElementById('sub2-side').value, equipment: document.getElementById('sub2-equip').value, mood: document.getElementById('sub2-mood').value };
+    workoutsData.push(sub1,sub2);
   } else {
-    workoutsData.push({
-      exercise: exerciseName,
-      sets: setsInput.value,
-      reps: repsInput.value,
-      weight: weightInput.value,
-      side: sideInput.value,
-      equipment: equipInput.value,
-      mood: moodInput.value
-    });
+    const normal={ exercise: exName, sets: setsInput.value, reps: document.getElementById('reps-input').value, weight: document.getElementById('weight-input').value, side: document.getElementById('side-input').value, equipment: document.getElementById('equip-input').value, mood: document.getElementById('mood-input').value };
+    workoutsData.push(normal);
   }
   localStorage.setItem('day3_1hr', JSON.stringify(workoutsData));
   renderWorkouts();
   form.reset();
-  setsInput.value = exercises.find(e=>e.name===exerciseInput.value).sets;
-  supersetContainer.style.display='none';
+  setsInput.value=exercises.find(e=>e.name===exerciseInput.value).sets;
+  document.getElementById('superset-container').style.display='none';
+  document.getElementById('normal-inputs').style.display='flex';
 });
 
-clearBtn.addEventListener('click', ()=>{
-  workoutsData=[];
-  localStorage.setItem('day3_1hr', JSON.stringify(workoutsData));
-  renderWorkouts();
-});
+// Clear all
+document.getElementById('clear-btn').addEventListener('click',()=>{workoutsData=[]; localStorage.setItem('day3_1hr', JSON.stringify(workoutsData)); renderWorkouts();});
 </script>
 </body>
 </html>
