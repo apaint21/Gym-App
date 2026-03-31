@@ -65,16 +65,21 @@ li { background:white; margin:5px 0; padding:10px; border-left:5px solid #28a745
   <option value="BW">Bodyweight</option>
 </select>
 <input type="number" id="rest-input" placeholder="Rest sec" min="0">
-<select id="superset-ex1">
-  <option value="">Superset 1</option>
-  <option value="Ez Bar Curl">Ez Bar Curl</option>
-  <option value="DB Curl">DB Curl</option>
-</select>
-<select id="superset-ex2">
-  <option value="">Superset 2</option>
-  <option value="Rope Pushdown">Rope Pushdown</option>
-  <option value="Overhead Ext">Overhead Ext</option>
-</select>
+
+<!-- Superset dropdowns (hidden by default, only for Day 3) -->
+<div id="superset-container" style="display:none;">
+  <select id="superset-ex1">
+    <option value="">Superset 1</option>
+    <option value="Ez Bar Curl">Ez Bar Curl</option>
+    <option value="DB Curl">DB Curl</option>
+  </select>
+  <select id="superset-ex2">
+    <option value="">Superset 2</option>
+    <option value="Rope Pushdown">Rope Pushdown</option>
+    <option value="Overhead Ext">Overhead Ext</option>
+  </select>
+</div>
+
 <div>
   <button type="button" class="feedback-btn easy" data-feedback="easy">Easy</button>
   <button type="button" class="feedback-btn stay" data-feedback="stay">Stay</button>
@@ -98,6 +103,7 @@ const equipInput = document.getElementById('equip-input');
 const restInput = document.getElementById('rest-input');
 const list = document.getElementById('workout-list');
 const clearBtn = document.getElementById('clear-btn');
+const supersetContainer = document.getElementById('superset-container');
 const supersetEx1 = document.getElementById('superset-ex1');
 const supersetEx2 = document.getElementById('superset-ex2');
 const feedbackBtns = document.querySelectorAll('.feedback-btn');
@@ -105,22 +111,20 @@ const feedbackBtns = document.querySelectorAll('.feedback-btn');
 let currentDay = 'day1_1hr';
 let workoutsData = {};
 
-// Template with exercises, sets/reps/rest
 const workoutsTemplate = {
   day1_1hr:[
     {exercise:"Squat", sets:3, reps:"12-15", rest:150},
     {exercise:"RDL", sets:3, reps:"6-8", rest:90},
     {exercise:"Incline DB Press", sets:3, reps:"6-8", rest:75},
     {exercise:"Row", sets:3, reps:"8-10", rest:75},
-    {exercise:"Plank", sets:2, reps:1, rest:60}
+    {exercise:"Plank", sets:2, reps:60, rest:60} // Fixed Plank
   ],
   day2_1hr:[
     {exercise:"Pull-Ups or Lat Pulldown", sets:4, reps:"AMAP", rest:105},
     {exercise:"DB Bench", sets:3, reps:"8-10", rest:120},
     {exercise:"Bulgarian Split Squat", sets:3, reps:"8 / leg", rest:60},
     {exercise:"Hamstring Curl", sets:3, reps:"10-12", rest:60},
-    {exercise:"Face Pulls", sets:2, reps:"12-15", rest:60},
-    {exercise:"Bi/Tri Superset", sets:2, reps:"10-12", rest:60}
+    {exercise:"Face Pulls", sets:2, reps:"12-15", rest:60}
   ],
   day3_1hr:[
     {exercise:"Squat", sets:3, reps:"8-10", rest:90},
@@ -129,14 +133,10 @@ const workoutsTemplate = {
     {exercise:"Incline DB Press", sets:3, reps:"8-10", rest:75},
     {exercise:"Bi/Tri Superset", sets:2, reps:"10-12", rest:60}
   ],
-  day1_lt1hr:[],
-  day2_lt1hr:[],
-  day3_lt1hr:[],
-  day1_2of2:[],
-  day2_2of2:[]
+  day1_lt1hr:[], day2_lt1hr:[], day3_lt1hr:[], day1_2of2:[], day2_2of2:[]
 };
 
-// Load from localStorage or use template
+// Load from localStorage or template
 if(localStorage.getItem('workoutsData')){
   workoutsData = JSON.parse(localStorage.getItem('workoutsData'));
 }else{
@@ -152,6 +152,9 @@ function populateExerciseDropdown(){
     opt.textContent=ex.exercise;
     exerciseInput.appendChild(opt);
   });
+
+  // Superset visible only on Day 3
+  supersetContainer.style.display = (currentDay==="day3_1hr") ? "flex" : "none";
 }
 populateExerciseDropdown();
 
@@ -263,4 +266,3 @@ renderWorkouts();
 </script>
 </body>
 </html>
- 
