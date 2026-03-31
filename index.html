@@ -25,6 +25,7 @@ li.highlight { background-color: #e0f7fa; }
 #clear-btn { display:block; margin: 20px auto; background-color:#007bff; }
 .session-info { flex: 1; margin-right: 10px; }
 .session-meta { font-size: 0.9em; color: #555; }
+#history-display { font-size: 0.85em; color: #555; margin-left:10px; margin-top:3px; }
 </style>
 </head>
 <body>
@@ -41,6 +42,7 @@ li.highlight { background-color: #e0f7fa; }
 <form id="workout-form">
 <select id="exercise-input" required></select>
 <span id="rest-display" style="margin-left:10px; font-weight:bold;"></span>
+<div id="history-display"></div>
 
 <div style="display:flex; gap:10px; align-items:center;">
   <input type="number" id="sets-input" placeholder="Sets" min="1" required readonly style="width:70px;">
@@ -85,10 +87,11 @@ const moodInput = document.getElementById('mood-input');
 const list = document.getElementById('workout-list');
 const clearBtn = document.getElementById('clear-btn');
 const restDisplay = document.getElementById('rest-display');
+const historyDisplay = document.getElementById('history-display');
 let currentDay = 'day1_1hr';
 let workoutsData = {};
 
-// Preloaded exercises with sets/reps/rest
+// Preloaded exercises for all tabs
 const preloadedExercises = {
   day1_1hr: [
     { name: 'Squat', sets: 3, reps: '12-15', rest: '2-3 min', type:'normal' },
@@ -96,6 +99,57 @@ const preloadedExercises = {
     { name: 'Incline DB Press', sets: 3, reps: '6-8', rest: '75-90 sec', type:'normal' },
     { name: 'Row', sets: 3, reps: '8-10', rest: '75-90 sec', type:'normal' },
     { name: 'Plank', sets: 2, reps: '60 sec', rest: '', type:'normal' }
+  ],
+  day2_1hr: [
+    { name: 'Pull-Ups or Lat Pulldown', sets: 4, reps: 'AMAP', rest: '90-120 sec', type:'normal' },
+    { name: 'DB Bench', sets: 3, reps: '8-10', rest: '120 sec', type:'normal' },
+    { name: 'Bulgarian Split Squat', sets: 3, reps: '8 / leg', rest: '60 sec', type:'normal' },
+    { name: 'Hamstring Curl', sets: 2, reps: '10-12', rest: '60 sec', type:'normal' },
+    { name: 'Face Pulls', sets: 2, reps: '12-15', rest: '60 sec', type:'normal' }
+  ],
+  day3_1hr: [
+    { name: 'Squat', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
+    { name: 'Hip Thrust or Glute Bridge', sets: 3, reps: '8-12', rest: '90 sec', type:'normal' },
+    { name: 'DB Row', sets: 3, reps: '8-10', rest: '90 sec', type:'normal' },
+    { name: 'Incline DB Press', sets: 3, reps: '8-10', rest: '75-90 sec', type:'normal' },
+    { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', type:'superset', subExercises: [
+      { name: 'Ez Bar Curl', lastWeight: '', reps: '' },
+      { name: 'DB Curl', lastWeight: '', reps: '' },
+      { name: 'Rope Pushdown', lastWeight: '', reps: '' },
+      { name: 'Overhead Extension', lastWeight: '', reps: '' }
+    ]}
+  ],
+  day1_lt1hr: [
+    { name: 'Squat', sets: 3, reps: '12-15', rest: '120 sec', type:'normal' },
+    { name: 'Chest/Back Superset', sets: 3, reps: '6-10', rest: '60-75 sec', type:'superset', subExercises:[
+      {name:'Incline Press', sets:3, reps:'6-8'},
+      {name:'Row', sets:3, reps:'8-10'}
+    ]},
+    { name: 'RDL', sets: 3, reps: '6-8', rest: '75-90 sec', type:'normal' },
+    { name: 'Plank', sets: 2, reps: '60', rest: '', type:'normal' }
+  ],
+  day2_lt1hr: [
+    { name: 'Pull-Ups or Lat Pulldown', sets: 4, reps: 'AMAP', rest:'', type:'normal' },
+    { name: 'Superset', sets:3, reps:'8-15', rest:'60 sec', type:'superset', subExercises:[
+      {name:'Bench', sets:3, reps:'8-10'},
+      {name:'Face Pulls', sets:3, reps:'12-15'}
+    ]},
+    { name: 'Bulgarian Split Squat', sets:3, reps:'8', rest:'60 sec', type:'normal'},
+    { name: 'Hamstring Curl', sets:2, reps:'10-12', rest:'90 sec', type:'normal'}
+  ],
+  day3_lt1hr: [
+    { name: 'Squat', sets:3, reps:'8-10', rest:'90 sec', type:'normal' },
+    { name: 'Hip Thrust or Glute Bridge', sets:3, reps:'8-12', rest:'90 sec', type:'normal' },
+    { name: 'Chest/Back Superset', sets:3, reps:'8-10', rest:'60 sec', type:'superset', subExercises:[
+      {name:'Row', sets:3, reps:'8-10'},
+      {name:'Incline Press', sets:3, reps:'8-10'}
+    ]},
+    { name: 'Bi/Tri Superset', sets:2, reps:'10-12', rest:'60 sec', type:'superset', subExercises:[
+      {name:'EZ Bar Curl', sets:2, reps:'10-12'},
+      {name:'DB Curl', sets:2, reps:'10-12'},
+      {name:'Rope Pushdown', sets:2, reps:'10-12'},
+      {name:'Overhead Extension', sets:2, reps:'10-12'}
+    ]}
   ]
 };
 
@@ -104,6 +158,7 @@ if(localStorage.getItem('workoutsData')) {
   workoutsData = JSON.parse(localStorage.getItem('workoutsData'));
 }
 
+// Populate dropdown
 function populateExerciseDropdown() {
   exerciseInput.innerHTML = '';
   const exercises = preloadedExercises[currentDay];
@@ -120,9 +175,21 @@ function populateExerciseDropdown() {
 
   renderWorkouts();
   highlightSelectedExercise();
+  updateHistory();
 }
 
-// Render workouts and preloaded exercises
+// Update history line
+function updateHistory() {
+  const sessions = workoutsData[currentDay] || [];
+  const lastSession = [...sessions].reverse().find(s => s.exercise === exerciseInput.value);
+  if(lastSession){
+    historyDisplay.textContent = `Last: ${lastSession.sets} sets x ${lastSession.reps} reps | Weight: ${lastSession.weight} | ${lastSession.side} | ${lastSession.equipment} | Mood: ${lastSession.mood}`;
+  } else {
+    historyDisplay.textContent = '';
+  }
+}
+
+// Render all workouts
 function renderWorkouts() {
   list.innerHTML = '';
   const sessions = workoutsData[currentDay] || [];
@@ -144,15 +211,17 @@ function renderWorkouts() {
       localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
       renderWorkouts();
       highlightSelectedExercise();
+      updateHistory();
     });
     li.appendChild(delBtn);
     list.appendChild(li);
   });
 
   highlightSelectedExercise();
+  updateHistory();
 }
 
-// Highlight selected exercise
+// Highlight selected exercise in the list
 function highlightSelectedExercise() {
   const items = list.querySelectorAll('li');
   items.forEach(li => {
@@ -164,13 +233,14 @@ function highlightSelectedExercise() {
   });
 }
 
-// Update sets and rest display when dropdown changes
+// Exercise change
 exerciseInput.addEventListener('change', () => {
   const selectedEx = preloadedExercises[currentDay].find(ex => ex.name === exerciseInput.value);
   setsInput.value = selectedEx ? selectedEx.sets : '';
   restDisplay.textContent = selectedEx ? `Rest: ${selectedEx.rest}` : '';
   renderWorkouts();
   highlightSelectedExercise();
+  updateHistory();
 });
 
 // Initial setup
@@ -192,6 +262,7 @@ form.addEventListener('submit', e => {
   localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
   renderWorkouts();
   form.reset();
+  updateHistory();
 });
 
 // Tab switching
@@ -210,6 +281,7 @@ clearBtn.addEventListener('click',()=>{
   workoutsData[currentDay]=[];
   localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
   renderWorkouts();
+  updateHistory();
 });
 </script>
 </body>
