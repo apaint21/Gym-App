@@ -41,8 +41,13 @@ li.highlight { background-color: #e0f7fa; }
 <form id="workout-form">
 <select id="exercise-input" required></select>
 <span id="rest-display" style="margin-left:10px; font-weight:bold;"></span>
-<input type="number" id="reps-input" placeholder="Reps Completed" min="1" required>
-<input type="number" id="sets-input" placeholder="Sets" min="1" required readonly>
+
+<div style="display:flex; gap:10px; align-items:center;">
+  <input type="number" id="sets-input" placeholder="Sets" min="1" required readonly style="width:70px;">
+  <input type="number" id="reps-input" placeholder="Reps Completed" min="1" required style="width:120px;">
+  <input type="number" id="weight-input" placeholder="Weight Used" min="0" style="width:120px;">
+</div>
+
 <select id="side-input" required>
 <option value="">Single/Both</option>
 <option value="Single Leg/Arm">Single Leg/Arm</option>
@@ -73,6 +78,7 @@ const form = document.getElementById('workout-form');
 const exerciseInput = document.getElementById('exercise-input');
 const repsInput = document.getElementById('reps-input');
 const setsInput = document.getElementById('sets-input');
+const weightInput = document.getElementById('weight-input');
 const sideInput = document.getElementById('side-input');
 const equipInput = document.getElementById('equip-input');
 const moodInput = document.getElementById('mood-input');
@@ -129,7 +135,7 @@ function renderWorkouts() {
 
   sessions.forEach((session,index) => {
     const li = document.createElement('li');
-    li.innerHTML = `<div class="session-info"><strong>${session.exercise}</strong> - ${session.sets} sets x ${session.reps} reps<div class="session-meta">${session.side} | ${session.equipment} | Mood: ${session.mood}</div></div>`;
+    li.innerHTML = `<div class="session-info"><strong>${session.exercise}</strong> - ${session.sets} sets x ${session.reps} reps | Weight: ${session.weight}<div class="session-meta">${session.side} | ${session.equipment} | Mood: ${session.mood}</div></div>`;
     const delBtn = document.createElement('button');
     delBtn.textContent = 'Delete';
     delBtn.classList.add('delete-btn');
@@ -172,16 +178,17 @@ populateExerciseDropdown();
 renderWorkouts();
 
 // Form submit
-form.addEventListener('submit',e=>{
+form.addEventListener('submit', e => {
   e.preventDefault();
   const exercise = exerciseInput.value;
   const reps = repsInput.value;
   const sets = setsInput.value;
+  const weight = weightInput.value;
   const side = sideInput.value;
   const equipment = equipInput.value;
   const mood = moodInput.value;
   if(!workoutsData[currentDay]) workoutsData[currentDay]=[];
-  workoutsData[currentDay].push({exercise,reps,sets,side,equipment,mood});
+  workoutsData[currentDay].push({exercise,reps,sets,weight,side,equipment,mood});
   localStorage.setItem('workoutsData',JSON.stringify(workoutsData));
   renderWorkouts();
   form.reset();
