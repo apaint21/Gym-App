@@ -534,125 +534,16 @@ index.html
           </div>
         </div>
 
-        <!-- Superset sub-exercise pickers (shown only for Bi/Tri Superset) -->
+        <!-- Superset sub-exercise pickers (dynamically built per superset type) -->
         <div id="superset-pickers" style="display:none">
-
-          <!-- Shared sets row -->
           <div style="margin-bottom:10px">
             <label class="field" style="max-width:120px">
               Sets
               <input type="number" id="superset-sets-input" placeholder="—" min="1" readonly style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:0.95rem;font-family:'DM Sans',sans-serif;outline:none;width:100%;">
             </label>
           </div>
-
-          <!-- Bicep block -->
-          <div class="superset-block">
-            <div class="superset-block-label">💪 Bicep</div>
-            <div style="margin-bottom:8px">
-              <label class="field">
-                Exercise
-                <select id="bi-input">
-                  <option value="">— Select —</option>
-                  <option value="EZ Bar Curl">EZ Bar Curl</option>
-                  <option value="DB Curl">DB Curl</option>
-                </select>
-              </label>
-            </div>
-            <div class="form-row-3" style="margin-bottom:8px">
-              <label class="field">
-                Reps
-                <input type="number" id="bi-reps" placeholder="e.g. 12" min="1">
-              </label>
-              <label class="field">
-                Weight (lbs)
-                <input type="number" id="bi-weight" placeholder="0 = BW" min="0">
-              </label>
-              <label class="field">
-                Equipment
-                <select id="bi-equip">
-                  <option value="">—</option>
-                  <option value="BB">Barbell</option>
-                  <option value="DB">Dumbbell</option>
-                  <option value="KB">Kettlebell</option>
-                  <option value="BW">Bodyweight</option>
-                </select>
-              </label>
-            </div>
-            <div class="form-row-2" style="margin-bottom:4px">
-              <label class="field">
-                Side
-                <select id="bi-side">
-                  <option value="">Both</option>
-                  <option value="Single Leg/Arm">Single</option>
-                  <option value="Bilateral">Bilateral</option>
-                </select>
-              </label>
-              <label class="field">
-                Mood
-                <select id="bi-mood">
-                  <option value="">—</option>
-                  <option value="Easy">😌 Easy</option>
-                  <option value="Stay">😤 Stay</option>
-                  <option value="Hard">🥵 Hard</option>
-                </select>
-              </label>
-            </div>
-          </div>
-
-          <!-- Tricep block -->
-          <div class="superset-block">
-            <div class="superset-block-label">💪 Tricep</div>
-            <div style="margin-bottom:8px">
-              <label class="field">
-                Exercise
-                <select id="tri-input">
-                  <option value="">— Select —</option>
-                  <option value="Rope Pulldown">Rope Pulldown</option>
-                  <option value="OH Extension">OH Extension</option>
-                </select>
-              </label>
-            </div>
-            <div class="form-row-3" style="margin-bottom:8px">
-              <label class="field">
-                Reps
-                <input type="number" id="tri-reps" placeholder="e.g. 12" min="1">
-              </label>
-              <label class="field">
-                Weight (lbs)
-                <input type="number" id="tri-weight" placeholder="0 = BW" min="0">
-              </label>
-              <label class="field">
-                Equipment
-                <select id="tri-equip">
-                  <option value="">—</option>
-                  <option value="BB">Barbell</option>
-                  <option value="DB">Dumbbell</option>
-                  <option value="KB">Kettlebell</option>
-                  <option value="BW">Bodyweight</option>
-                </select>
-              </label>
-            </div>
-            <div class="form-row-2" style="margin-bottom:4px">
-              <label class="field">
-                Side
-                <select id="tri-side">
-                  <option value="">Both</option>
-                  <option value="Single Leg/Arm">Single</option>
-                  <option value="Bilateral">Bilateral</option>
-                </select>
-              </label>
-              <label class="field">
-                Mood
-                <select id="tri-mood">
-                  <option value="">—</option>
-                  <option value="Easy">😌 Easy</option>
-                  <option value="Stay">😤 Stay</option>
-                  <option value="Hard">🥵 Hard</option>
-                </select>
-              </label>
-            </div>
-          </div>
-
+          <div id="superset-a-block" class="superset-block"></div>
+          <div id="superset-b-block" class="superset-block"></div>
         </div>
 
         <!-- Last session history for selected exercise -->
@@ -785,11 +676,41 @@ const preloadedExercises = {
     { name: 'Hip Thrust or Glute Bridge', sets: 3, reps: '8-12', rest: '90 sec' },
     { name: 'Row', sets: 3, reps: '8-10', rest: '90 sec' },
     { name: 'Incline Bench', sets: 3, reps: '8-10', rest: '90 sec' },
-    { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', superset: true }
+    { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', superset: true,
+      supersetA: { label: '💪 Bicep', options: ['EZ Bar Curl', 'DB Curl'] },
+      supersetB: { label: '💪 Tricep', options: ['Rope Pulldown', 'OH Extension'] }
+    }
   ],
-  day1_lt1hr: [],
-  day2_lt1hr: [],
-  day3_lt1hr: []
+  day1_lt1hr: [
+    { name: 'Squat', sets: 3, reps: '12-15', rest: '120 sec' },
+    { name: 'Chest/Back Superset', sets: 3, reps: '6-10', rest: '60-75 sec', superset: true,
+      supersetA: { label: '🏋️ Chest', options: ['Incline Press'] },
+      supersetB: { label: '🏋️ Back', options: ['Row'] }
+    },
+    { name: 'RDL', sets: 3, reps: '6-8', rest: '75-90 sec' },
+    { name: 'Plank', sets: 2, reps: '60 sec', rest: '' }
+  ],
+  day2_lt1hr: [
+    { name: 'Pull-Ups or Lat Pulldown', sets: 4, reps: 'AMAP', rest: '' },
+    { name: 'Bench/Face Pull Superset', sets: 3, reps: '8-15', rest: '60 sec', superset: true,
+      supersetA: { label: '🏋️ Push', options: ['Bench'] },
+      supersetB: { label: '🏋️ Pull', options: ['Face Pulls'] }
+    },
+    { name: 'Bulgarian Split Squat', sets: 3, reps: '8 / leg', rest: '60 sec' },
+    { name: 'Hamstring Curl', sets: 2, reps: '10-12', rest: '90 sec' }
+  ],
+  day3_lt1hr: [
+    { name: 'Squat', sets: 3, reps: '8-10', rest: '90 sec' },
+    { name: 'Hip Thrust or Glute Bridge', sets: 3, reps: '8-12', rest: '90 sec' },
+    { name: 'Chest/Back Superset', sets: 3, reps: '8-10', rest: '60 sec', superset: true,
+      supersetA: { label: '🏋️ Back', options: ['Row'] },
+      supersetB: { label: '🏋️ Chest', options: ['Incline Press'] }
+    },
+    { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', superset: true,
+      supersetA: { label: '💪 Bicep', options: ['EZ Bar Curl', 'DB Curl'] },
+      supersetB: { label: '💪 Tricep', options: ['Rope Pulldown', 'OH Extension'] }
+    }
+  ]
 };
 
 let currentDay = 'day1_1hr';
@@ -876,24 +797,79 @@ function populateExerciseDropdown() {
   updateExerciseDetails();
 }
 
+function buildSupersetBlock(blockEl, side, config) {
+  const optionsHtml = config.options.map(o => `<option value="${o}">${o}</option>`).join('');
+  const autoSelect = config.options.length === 1 ? `value="${config.options[0]}"` : '';
+  blockEl.innerHTML = `
+    <div class="superset-block-label">${config.label}</div>
+    <div style="margin-bottom:8px">
+      <label class="field">
+        Exercise
+        <select id="${side}-input">
+          ${config.options.length > 1 ? '<option value="">— Select —</option>' : ''}
+          ${optionsHtml}
+        </select>
+      </label>
+    </div>
+    <div class="form-row-3" style="margin-bottom:8px">
+      <label class="field">Reps<input type="number" id="${side}-reps" placeholder="e.g. 12" min="1"></label>
+      <label class="field">Weight (lbs)<input type="number" id="${side}-weight" placeholder="0 = BW" min="0"></label>
+      <label class="field">Equipment
+        <select id="${side}-equip">
+          <option value="">—</option>
+          <option value="BB">Barbell</option>
+          <option value="DB">Dumbbell</option>
+          <option value="KB">Kettlebell</option>
+          <option value="BW">Bodyweight</option>
+        </select>
+      </label>
+    </div>
+    <div class="form-row-2">
+      <label class="field">Side
+        <select id="${side}-side">
+          <option value="">Both</option>
+          <option value="Single Leg/Arm">Single</option>
+          <option value="Bilateral">Bilateral</option>
+        </select>
+      </label>
+      <label class="field">Mood
+        <select id="${side}-mood">
+          <option value="">—</option>
+          <option value="Easy">😌 Easy</option>
+          <option value="Stay">😤 Stay</option>
+          <option value="Hard">🥵 Hard</option>
+        </select>
+      </label>
+    </div>`;
+  // auto-select if only one option
+  if (config.options.length === 1) {
+    blockEl.querySelector(`#${side}-input`).value = config.options[0];
+  }
+  // hook up change to refresh history hint
+  blockEl.querySelector(`#${side}-input`).addEventListener('change', updateExerciseDetails);
+}
+
 function updateExerciseDetails() {
   const ex = (preloadedExercises[currentDay] || []).find(e => e.name === exerciseInput.value);
   const supersetPickers = document.getElementById('superset-pickers');
+  const normalFields = document.getElementById('normal-fields');
 
   if (!ex) {
     document.getElementById('rest-badge').style.display = 'none';
     document.getElementById('ex-history-hint').style.display = 'none';
     supersetPickers.style.display = 'none';
+    normalFields.style.display = 'block';
     return;
   }
   setsInput.value = ex.sets;
 
-  // Show/hide superset pickers and normal fields
-  const normalFields = document.getElementById('normal-fields');
+  // Show/hide superset vs normal fields
   if (ex.superset) {
     supersetPickers.style.display = 'block';
     normalFields.style.display = 'none';
     document.getElementById('superset-sets-input').value = ex.sets;
+    buildSupersetBlock(document.getElementById('superset-a-block'), 'ss-a', ex.supersetA);
+    buildSupersetBlock(document.getElementById('superset-b-block'), 'ss-b', ex.supersetB);
   } else {
     supersetPickers.style.display = 'none';
     normalFields.style.display = 'block';
@@ -908,18 +884,17 @@ function updateExerciseDetails() {
     restBadge.style.display = 'none';
   }
 
-  // Last session history hint — for superset, show last of either sub-exercise
+  // History hint
   const hint = document.getElementById('ex-history-hint');
   let lastEntry;
   if (ex.superset) {
-    const biVal = document.getElementById('bi-input').value;
-    const triVal = document.getElementById('tri-input').value;
-    const lookFor = biVal || triVal || null;
+    const aEl = document.getElementById('ss-a-input');
+    const bEl = document.getElementById('ss-b-input');
+    const lookFor = (aEl && aEl.value) || (bEl && bEl.value) || null;
     lastEntry = lookFor ? [...historyData].reverse().find(h => h.exercise === lookFor) : null;
   } else {
     lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name);
   }
-
   if (lastEntry) {
     const d = new Date(lastEntry.date + 'T12:00:00');
     hint.style.display = 'block';
@@ -937,57 +912,48 @@ function updateExerciseDetails() {
   }
 }
 exerciseInput.addEventListener('change', updateExerciseDetails);
-document.getElementById('bi-input').addEventListener('change', updateExerciseDetails);
-document.getElementById('tri-input').addEventListener('change', updateExerciseDetails);
+
+function getVal(id, fallback = '') {
+  const el = document.getElementById(id);
+  return el ? el.value || fallback : fallback;
+}
 
 form.addEventListener('submit', e => {
   e.preventDefault();
   const exercise = exerciseInput.value;
-  const reps = repsInput.value;
-  const sets = setsInput.value;
-  const weight = weightInput.value || '0';
-  const side = sideInput.value || 'Both';
-  const equipment = equipInput.value || 'BW';
-  const mood = moodInput.value;
   const date = new Date().toISOString().split('T')[0];
   const ex = (preloadedExercises[currentDay] || []).find(e => e.name === exercise);
-
   if (!workoutsData[currentDay]) workoutsData[currentDay] = [];
 
   if (ex && ex.superset) {
-    const biVal = document.getElementById('bi-input').value;
-    const triVal = document.getElementById('tri-input').value;
-    if (!biVal || !triVal) { showToast('⚠️ Please select both exercises'); return; }
+    const aVal = getVal('ss-a-input');
+    const bVal = getVal('ss-b-input');
+    if (!aVal || !bVal) { showToast('⚠️ Please select both exercises'); return; }
     const sets = document.getElementById('superset-sets-input').value;
-    // Bicep entry
-    const biEntry = {
-      exercise: biVal,
-      sets,
-      reps:      document.getElementById('bi-reps').value || '0',
-      weight:    document.getElementById('bi-weight').value || '0',
-      equipment: document.getElementById('bi-equip').value || 'BW',
-      side:      document.getElementById('bi-side').value || 'Both',
-      mood:      document.getElementById('bi-mood').value || 'Stay',
-      date
+    const aEntry = {
+      exercise: aVal, sets,
+      reps: getVal('ss-a-reps', '0'), weight: getVal('ss-a-weight', '0'),
+      equipment: getVal('ss-a-equip', 'BW'), side: getVal('ss-a-side', 'Both'),
+      mood: getVal('ss-a-mood', 'Stay'), date
     };
-    // Tricep entry
-    const triEntry = {
-      exercise: triVal,
-      sets,
-      reps:      document.getElementById('tri-reps').value || '0',
-      weight:    document.getElementById('tri-weight').value || '0',
-      equipment: document.getElementById('tri-equip').value || 'BW',
-      side:      document.getElementById('tri-side').value || 'Both',
-      mood:      document.getElementById('tri-mood').value || 'Stay',
-      date
+    const bEntry = {
+      exercise: bVal, sets,
+      reps: getVal('ss-b-reps', '0'), weight: getVal('ss-b-weight', '0'),
+      equipment: getVal('ss-b-equip', 'BW'), side: getVal('ss-b-side', 'Both'),
+      mood: getVal('ss-b-mood', 'Stay'), date
     };
-    workoutsData[currentDay].push(biEntry);
-    historyData.push({ ...biEntry, day: currentDay });
-    workoutsData[currentDay].push(triEntry);
-    historyData.push({ ...triEntry, day: currentDay });
+    workoutsData[currentDay].push(aEntry, bEntry);
+    historyData.push({ ...aEntry, day: currentDay }, { ...bEntry, day: currentDay });
     showToast('✅ Superset logged!');
   } else {
-    const entry = { exercise, reps, sets, weight, side, equipment, mood, date };
+    const entry = {
+      exercise,
+      reps: repsInput.value, sets: setsInput.value,
+      weight: weightInput.value || '0',
+      side: sideInput.value || 'Both',
+      equipment: equipInput.value || 'BW',
+      mood: moodInput.value, date
+    };
     workoutsData[currentDay].push(entry);
     historyData.push({ ...entry, day: currentDay });
     showToast('✅ Set logged!');
