@@ -513,6 +513,8 @@ index.html
       <button class="tab" data-day="day1_lt1hr">Day 1 — &lt;1hr</button>
       <button class="tab" data-day="day2_lt1hr">Day 2 — &lt;1hr</button>
       <button class="tab" data-day="day3_lt1hr">Day 3 — &lt;1hr</button>
+      <button class="tab" data-day="day1_of2">Day 1 of 2</button>
+      <button class="tab" data-day="day2_of2">Day 2 of 2</button>
     </div>
   </div>
 
@@ -707,6 +709,29 @@ const preloadedExercises = {
       supersetB: { label: '🏋️ Chest', options: ['Incline Press'] }
     },
     { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', superset: true,
+      supersetA: { label: '💪 Bicep', options: ['EZ Bar Curl', 'DB Curl'] },
+      supersetB: { label: '💪 Tricep', options: ['Rope Pulldown', 'OH Extension'] }
+    }
+  ],
+  day1_of2: [
+    { name: 'Squat', sets: 4, reps: '12-15', rest: '2 min' },
+    { name: 'Chest/Back Superset', sets: 3, reps: '6-10', rest: '60-75 sec', superset: true,
+      supersetA: { label: '🏋️ Chest', options: ['Incline DB Press'] },
+      supersetB: { label: '🏋️ Back', options: ['Row'] }
+    },
+    { name: 'Romanian Deadlift', sets: 3, reps: '6-8', rest: '75-90 sec' },
+    { name: 'Face Pulls', sets: 1, reps: '15', rest: '2 min' },
+    { name: 'Plank', sets: 1, reps: '60+ sec', rest: '' }
+  ],
+  day2_of2: [
+    { name: 'Squat', sets: 3, reps: '12-15', rest: '90 sec' },
+    { name: 'Bulgarian Split Squat', sets: 3, reps: '8 / leg', rest: '60 sec' },
+    { name: 'Back/Chest Superset', sets: 3, reps: '8-12', rest: '60 sec', superset: true,
+      supersetA: { label: '🏋️ Back', options: ['Pull-Ups or Lat Pulldown'] },
+      supersetB: { label: '🏋️ Chest', options: ['Bench'] }
+    },
+    { name: 'Hamstring Curl', sets: 2, reps: '10-12', rest: '90 sec' },
+    { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '90 sec', superset: true,
       supersetA: { label: '💪 Bicep', options: ['EZ Bar Curl', 'DB Curl'] },
       supersetB: { label: '💪 Tricep', options: ['Rope Pulldown', 'OH Extension'] }
     }
@@ -1156,3 +1181,4 @@ renderWorkouts();
 </script>
 </body>
 </html>
+
