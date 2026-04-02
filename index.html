@@ -370,6 +370,10 @@
     <span class="export-icon">🖨</span>
     <span class="export-text"><strong>Print / Save as PDF</strong><span>Opens a print-friendly summary of all your sessions</span></span>
   </button>
+  <button class="export-btn" id="reset-history" style="border-color:var(--danger)">
+    <span class="export-icon">🗑</span>
+    <span class="export-text"><strong>Reset All History</strong><span>Wipe all logged sessions and start fresh</span></span>
+  </button>
 </div>
 
 <div id="toast"></div>
@@ -837,18 +841,17 @@ form.addEventListener('submit', e => {
       const oldDate = oldEntry.date;
       workoutsData[currentDay][editingIndex] = entry;
 
-      // If date changed, migrate ALL history entries logged on that date to the new date
+      // If date changed, migrate only entries from the same day-tab and same old date
       if (oldDate !== date) {
         historyData.forEach(h => {
-          if (h.date === oldDate) h.date = date;
+          if (h.day === currentDay && h.date === oldDate) h.date = date;
         });
-        // Also update all workoutsData entries for this day
         (workoutsData[currentDay] || []).forEach(w => {
           if (w.date === oldDate) w.date = date;
         });
       } else {
-        // Date unchanged — just update the specific history entry
-        const hi = historyData.findIndex(h => h.date === oldDate && h.exercise === oldExercise);
+        // Date unchanged — just update this specific history entry
+        const hi = historyData.findIndex(h => h.day === currentDay && h.date === oldDate && h.exercise === oldExercise);
         if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
       }
       showToast('✏️ Entry updated!');
@@ -1151,6 +1154,14 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   workoutsData[currentDay] = [];
   if (editingIndex !== null) cancelEdit();
   saveData(); renderWorkouts(); showToast('Cleared!');
+});
+
+document.getElementById('reset-history').addEventListener('click', () => {
+  if (!confirm('This will wipe ALL logged history and sessions. Are you sure?')) return;
+  historyData = [];
+  workoutsData = {};
+  if (editingIndex !== null) cancelEdit();
+  saveData(); renderWorkouts(); showToast('🗑 All history cleared!');
 });
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
