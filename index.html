@@ -181,6 +181,27 @@
 
   #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface3); border: 1px solid var(--border); color: var(--text); padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 200; white-space: nowrap; }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* CALENDAR */
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; }
+  .cal-nav h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 2px; color: var(--text); }
+  .cal-arrow { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; transition: all 0.15s; }
+  .cal-arrow:hover { border-color: var(--accent); color: var(--accent); }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 0 16px 16px; }
+  .cal-dow { text-align: center; font-size: 0.65rem; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 0 6px; }
+  .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.82rem; font-weight: 500; color: var(--text2); cursor: default; position: relative; transition: all 0.12s; border: 1px solid transparent; }
+  .cal-day.empty { }
+  .cal-day.today { border-color: var(--accent); color: var(--accent); }
+  .cal-day.has-workout { background: rgba(200,241,53,0.12); color: var(--text); cursor: pointer; border-color: rgba(200,241,53,0.25); }
+  .cal-day.has-workout:hover { background: rgba(200,241,53,0.22); border-color: var(--accent); }
+  .cal-day.has-workout .cal-check { font-size: 0.55rem; color: var(--accent); line-height: 1; margin-top: 1px; }
+  .cal-day.selected { background: var(--accent) !important; color: #0d0d0f !important; border-color: var(--accent) !important; }
+  .cal-day.selected .cal-check { color: #0d0d0f; }
+  .cal-detail { background: var(--surface); border: 1px solid var(--accent); border-radius: 12px; margin: 0 16px 16px; padding: 14px 16px; animation: slideIn 0.18s ease; }
+  .cal-detail-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 1.5px; color: var(--accent); margin-bottom: 10px; }
+  .cal-entry { background: var(--surface2); border-radius: 8px; padding: 9px 12px; margin-bottom: 6px; font-size: 0.85rem; }
+  .cal-entry strong { font-weight: 600; display: block; margin-bottom: 2px; }
+  .cal-entry .cal-entry-meta { font-size: 0.75rem; color: var(--text2); }
 </style>
 </head>
 <body>
@@ -300,6 +321,11 @@
             </label>
           </div>
         </div>
+        <div style="margin-top:10px">
+          <label class="field">Session Date
+            <input type="date" id="session-date-input">
+          </label>
+        </div>
         <button type="submit" class="submit-btn" id="submit-btn">+ Add Set</button>
       </form>
     </div>
@@ -314,8 +340,13 @@
 
 <!-- HISTORY VIEW -->
 <div class="view" id="view-history">
-  <div class="section-label">Workout History</div>
-  <div id="history-container"></div>
+  <div class="cal-nav">
+    <button class="cal-arrow" id="cal-prev">&#8249;</button>
+    <h2 id="cal-month-label"></h2>
+    <button class="cal-arrow" id="cal-next">&#8250;</button>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+  <div id="cal-detail" style="display:none"></div>
 </div>
 
 <!-- PRs VIEW -->
@@ -472,7 +503,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.classList.add('active');
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById('view-' + btn.dataset.view).classList.add('active');
-    if (btn.dataset.view === 'history') renderHistory();
+    if (btn.dataset.view === 'history') renderCalendar();
     if (btn.dataset.view === 'prs')     renderPRs();
   });
 });
@@ -531,9 +562,17 @@ const weightInput   = document.getElementById('weight-input');
 const sideInput     = document.getElementById('side-input');
 const equipInput    = document.getElementById('equip-input');
 const moodInput     = document.getElementById('mood-input');
+const sessionDateInput = document.getElementById('session-date-input');
 const form          = document.getElementById('workout-form');
 const submitBtn     = document.getElementById('submit-btn');
 const editBanner    = document.getElementById('edit-banner');
+
+// Set today's date as default
+sessionDateInput.value = new Date().toISOString().split('T')[0];
+
+weightInput.addEventListener('input', () => {
+  weightInput.dataset.userEdited = weightInput.value ? 'yes' : '';
+});
 
 // ─── CANCEL EDIT ─────────────────────────────────────────────────────────────
 function cancelEdit() {
@@ -542,6 +581,8 @@ function cancelEdit() {
   submitBtn.textContent = '+ Add Set';
   submitBtn.classList.remove('editing');
   form.reset();
+  sessionDateInput.value = new Date().toISOString().split('T')[0];
+  weightInput.dataset.userEdited = '';
   populateExerciseDropdown();
   updateExerciseDetails();
 }
@@ -657,11 +698,18 @@ function updateExerciseDetails() {
   } else {
     supersetPickers.style.display = 'none';
     normalFields.style.display = 'block';
-    // Auto-populate rep range as hint + placeholder
+    // Auto-populate rep range as hint
     if (repHint) repHint.textContent = `target: ${ex.reps}`;
+    // Pre-fill reps from last session if not user-edited
     if (!repsInput.dataset.userEdited) {
-      repsInput.value = '';
-      repsInput.placeholder = ex.reps;
+      const lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name);
+      if (lastEntry) {
+        repsInput.value = lastEntry.reps;
+        repsInput.dataset.userEdited = 'prefill';
+      } else {
+        repsInput.value = '';
+        repsInput.placeholder = ex.reps;
+      }
     }
   }
 
@@ -697,12 +745,17 @@ function updateExerciseDetails() {
         <span>🏋️ ${lastEntry.equipment}</span>
         <span class="mood-chip mood-${lastEntry.mood}">${lastEntry.mood}</span>
       </div>`;
+    // Pre-fill weight from last session if not editing and field is empty
+    if (!ex.superset && editingIndex === null && weightInput && !weightInput.dataset.userEdited) {
+      weightInput.value = lastEntry.weight > 0 ? lastEntry.weight : '';
+    }
   } else {
     hint.style.display = 'none';
   }
 }
 exerciseInput.addEventListener('change', () => {
   repsInput.dataset.userEdited = '';
+  weightInput.dataset.userEdited = '';
   updateExerciseDetails();
 });
 repsInput.addEventListener('input', () => {
@@ -729,7 +782,7 @@ function getNextExerciseName(currentExName) {
 form.addEventListener('submit', e => {
   e.preventDefault();
   const exercise = exerciseInput.value;
-  const date = new Date().toISOString().split('T')[0];
+  const date = sessionDateInput.value || new Date().toISOString().split('T')[0];
   const ex = (preloadedExercises[currentDay] || []).find(e => e.name === exercise);
   if (!workoutsData[currentDay]) workoutsData[currentDay] = [];
 
@@ -757,6 +810,8 @@ form.addEventListener('submit', e => {
       showToast('✅ Superset logged!');
       const nextEx = getNextExerciseName(exercise);
       saveData(); renderWorkouts();
+      weightInput.dataset.userEdited = '';
+      sessionDateInput.value = new Date().toISOString().split('T')[0];
       populateExerciseDropdown(nextEx || exercise);
       return;
     }
@@ -788,6 +843,8 @@ form.addEventListener('submit', e => {
       showToast('✅ Set logged!');
       saveData(); renderWorkouts();
       repsInput.dataset.userEdited = '';
+      weightInput.dataset.userEdited = '';
+      sessionDateInput.value = new Date().toISOString().split('T')[0];
       populateExerciseDropdown(nextEx || exercise);
       return;
     }
@@ -816,9 +873,11 @@ function startEdit(index) {
   repsInput.value = entry.reps;
   repsInput.dataset.userEdited = 'yes';
   weightInput.value = entry.weight > 0 ? entry.weight : '';
+  weightInput.dataset.userEdited = 'yes';
   sideInput.value = entry.side || '';
   equipInput.value = entry.equipment || '';
   moodInput.value = entry.mood || '';
+  if (entry.date) sessionDateInput.value = entry.date;
 
   // Scroll to form
   document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -860,6 +919,7 @@ function renderWorkouts() {
     sessions.forEach((s, i) => {
       const div = document.createElement('div');
       div.className = 'session-item';
+      const sDate = s.date ? new Date(s.date + 'T12:00:00').toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '';
       div.innerHTML = `
         <div class="s-info">
           <div class="s-name">${s.exercise}</div>
@@ -869,6 +929,7 @@ function renderWorkouts() {
             <span>· ${s.equipment}</span>
             ${s.side ? `<span>· ${s.side}</span>` : ''}
             <span class="mood-chip mood-${s.mood}">${s.mood}</span>
+            ${sDate ? `<span style="color:var(--text3);font-size:0.72rem">📅 ${sDate}</span>` : ''}
           </div>
         </div>
         <div class="item-actions">
@@ -896,34 +957,110 @@ function renderWorkouts() {
   }
 }
 
-// ─── HISTORY ──────────────────────────────────────────────────────────────────
-function renderHistory() {
-  const container = document.getElementById('history-container');
-  if (!historyData.length) {
-    container.innerHTML = '<div class="empty-state"><div class="big">No History Yet</div><p>Start logging sets to build your history.</p></div>';
-    return;
-  }
-  const grouped = {};
-  [...historyData].reverse().forEach(s => {
-    if (!grouped[s.date]) grouped[s.date] = [];
-    grouped[s.date].push(s);
-  });
-  container.innerHTML = '';
-  Object.keys(grouped).sort((a,b) => b.localeCompare(a)).forEach(date => {
-    const grp = document.createElement('div');
-    grp.className = 'date-group';
-    const d = new Date(date + 'T12:00:00');
-    grp.innerHTML = `<div class="date-header">${d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'})}</div>`;
-    grouped[date].forEach(s => {
-      grp.innerHTML += `
-        <div class="history-item">
-          <strong>${s.exercise}</strong> — ${s.sets}×${s.reps} @ ${s.weight > 0 ? s.weight + ' lbs' : 'BW'}
-          <div class="h-meta">${s.equipment}${s.side ? ' · ' + s.side : ''} · <span class="mood-chip mood-${s.mood}">${s.mood}</span></div>
-        </div>`;
-    });
-    container.appendChild(grp);
-  });
+// ─── CALENDAR ─────────────────────────────────────────────────────────────────
+let calYear, calMonth, calSelectedDate = null;
+
+function initCalendar() {
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth();
 }
+
+function renderCalendar() {
+  const monthLabel = document.getElementById('cal-month-label');
+  const grid = document.getElementById('cal-grid');
+  const detail = document.getElementById('cal-detail');
+
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  monthLabel.textContent = `${monthNames[calMonth]} ${calYear}`;
+
+  // Build set of dates that have workouts
+  const workoutDates = {};
+  historyData.forEach(s => {
+    if (!workoutDates[s.date]) workoutDates[s.date] = [];
+    workoutDates[s.date].push(s);
+  });
+
+  const today = new Date().toISOString().split('T')[0];
+  const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+  const dows = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  // Empty cells before first day
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasWorkout = !!workoutDates[dateStr];
+    const isToday = dateStr === today;
+    const isSelected = dateStr === calSelectedDate;
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    if (hasWorkout) cls += ' has-workout';
+    if (isSelected) cls += ' selected';
+    html += `<div class="${cls}" data-date="${dateStr}">
+      ${d}
+      ${hasWorkout ? `<span class="cal-check">✓</span>` : ''}
+    </div>`;
+  }
+
+  grid.innerHTML = html;
+
+  // Click handlers
+  grid.querySelectorAll('.cal-day.has-workout').forEach(el => {
+    el.addEventListener('click', () => {
+      const date = el.dataset.date;
+      if (calSelectedDate === date) {
+        calSelectedDate = null;
+        detail.style.display = 'none';
+      } else {
+        calSelectedDate = date;
+        showCalDetail(date, workoutDates[date]);
+      }
+      renderCalendar();
+    });
+  });
+
+  // Show/hide detail
+  if (calSelectedDate && workoutDates[calSelectedDate]) {
+    showCalDetail(calSelectedDate, workoutDates[calSelectedDate]);
+  } else if (!calSelectedDate) {
+    detail.style.display = 'none';
+  }
+}
+
+function showCalDetail(dateStr, entries) {
+  const detail = document.getElementById('cal-detail');
+  const d = new Date(dateStr + 'T12:00:00');
+  const label = d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+  let html = `<div class="cal-detail"><div class="cal-detail-title">${label}</div>`;
+  entries.forEach(s => {
+    html += `<div class="cal-entry">
+      <strong>${s.exercise}</strong>
+      <div class="cal-entry-meta">${s.sets} sets × ${s.reps} reps${s.weight > 0 ? ' · ' + s.weight + ' lbs' : ' · BW'}${s.equipment ? ' · ' + s.equipment : ''}${s.side ? ' · ' + s.side : ''} <span class="mood-chip mood-${s.mood}">${s.mood}</span></div>
+    </div>`;
+  });
+  html += '</div>';
+  detail.innerHTML = html;
+  detail.style.display = 'block';
+}
+
+document.getElementById('cal-prev').addEventListener('click', () => {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  calSelectedDate = null;
+  renderCalendar();
+});
+document.getElementById('cal-next').addEventListener('click', () => {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  calSelectedDate = null;
+  renderCalendar();
+});
+
+initCalendar();
 
 // ─── PRs ──────────────────────────────────────────────────────────────────────
 function renderPRs() {
