@@ -1156,21 +1156,6 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   saveData(); renderWorkouts(); showToast('Cleared!');
 });
 
-document.getElementById('reset-all-history').addEventListener('click', () => {
-  if (!confirm('This will wipe ALL logged history and sessions. Are you sure?')) return;
-  historyData = [];
-  workoutsData = {};
-  if (editingIndex !== null) cancelEdit();
-  saveData(); renderWorkouts(); showToast('🗑 All history cleared!');
-});
-document.getElementById('reset-history-export').addEventListener('click', () => {
-  if (!confirm('This will wipe ALL logged history and sessions. Are you sure?')) return;
-  historyData = [];
-  workoutsData = {};
-  if (editingIndex !== null) cancelEdit();
-  saveData(); renderWorkouts(); showToast('🗑 All history cleared!');
-});
-
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 populateExerciseDropdown();
 renderWorkouts();
