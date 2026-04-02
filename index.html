@@ -370,10 +370,6 @@
     <span class="export-icon">🖨</span>
     <span class="export-text"><strong>Print / Save as PDF</strong><span>Opens a print-friendly summary of all your sessions</span></span>
   </button>
-  <button class="export-btn" id="reset-history" style="border-color:var(--danger)">
-    <span class="export-icon">🗑</span>
-    <span class="export-text"><strong>Reset All History</strong><span>Wipe all logged sessions and start fresh</span></span>
-  </button>
 </div>
 
 <div id="toast"></div>
@@ -799,15 +795,12 @@ form.addEventListener('submit', e => {
     const bEntry = { exercise: bVal, sets, reps: getVal('ss-b-reps','0'), weight: getVal('ss-b-weight','0'), equipment: getVal('ss-b-equip','BW'), side: getVal('ss-b-side',''), mood: getVal('ss-b-mood','Stay'), date };
 
     if (editingIndex !== null) {
-      // Capture old entries before overwriting
-      const oldA = workoutsData[currentDay][editingIndex];
-      const oldB = workoutsData[currentDay][editingIndex + 1];
       // Replace the two superset entries at editingIndex and editingIndex+1
       workoutsData[currentDay].splice(editingIndex, 2, aEntry, bEntry);
-      // Update historyData using old dates
-      const hiA = historyData.findIndex(h => h.day === currentDay && h.date === (oldA && oldA.date) && h.exercise === (oldA && oldA.exercise));
+      // Update historyData too
+      const hiA = historyData.findIndex(h => h.day === currentDay && h.date === date && h.exercise === aEntry.exercise);
       if (hiA >= 0) historyData[hiA] = { ...aEntry, day: currentDay };
-      const hiB = historyData.findIndex(h => h.day === currentDay && h.date === (oldB && oldB.date) && h.exercise === (oldB && oldB.exercise));
+      const hiB = historyData.findIndex(h => h.day === currentDay && h.date === date && h.exercise === bEntry.exercise);
       if (hiB >= 0) historyData[hiB] = { ...bEntry, day: currentDay };
       showToast('✏️ Superset updated!');
       cancelEdit();
@@ -835,25 +828,12 @@ form.addEventListener('submit', e => {
     };
 
     if (editingIndex !== null) {
-      // Capture old values before overwriting
-      const oldEntry = workoutsData[currentDay][editingIndex];
-      const oldExercise = oldEntry.exercise;
-      const oldDate = oldEntry.date;
+      // Update the session entry
+      const oldExercise = workoutsData[currentDay][editingIndex].exercise;
       workoutsData[currentDay][editingIndex] = entry;
-
-      // If date changed, migrate only entries from the same day-tab and same old date
-      if (oldDate !== date) {
-        historyData.forEach(h => {
-          if (h.day === currentDay && h.date === oldDate) h.date = date;
-        });
-        (workoutsData[currentDay] || []).forEach(w => {
-          if (w.date === oldDate) w.date = date;
-        });
-      } else {
-        // Date unchanged — just update this specific history entry
-        const hi = historyData.findIndex(h => h.day === currentDay && h.date === oldDate && h.exercise === oldExercise);
-        if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
-      }
+      // Update history entry too
+      const hi = historyData.findIndex(h => h.day === currentDay && h.date === date && h.exercise === oldExercise);
+      if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
       showToast('✏️ Entry updated!');
       cancelEdit();
     } else {
@@ -885,17 +865,15 @@ function startEdit(index) {
   submitBtn.textContent = '💾 Save Changes';
   submitBtn.classList.add('editing');
 
-  // Set flags BEFORE updateExerciseDetails so pre-fill logic is skipped
-  repsInput.dataset.userEdited = 'yes';
-  weightInput.dataset.userEdited = 'yes';
-
-  // Select the exercise (updateExerciseDetails will see the flags above)
+  // Select the exercise
   exerciseInput.value = entry.exercise;
   updateExerciseDetails();
 
-  // Fill in fields after updateExerciseDetails so we overwrite any pre-fill
+  // Fill in fields
   repsInput.value = entry.reps;
+  repsInput.dataset.userEdited = 'yes';
   weightInput.value = entry.weight > 0 ? entry.weight : '';
+  weightInput.dataset.userEdited = 'yes';
   sideInput.value = entry.side || '';
   equipInput.value = entry.equipment || '';
   moodInput.value = entry.mood || '';
@@ -1154,14 +1132,6 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   workoutsData[currentDay] = [];
   if (editingIndex !== null) cancelEdit();
   saveData(); renderWorkouts(); showToast('Cleared!');
-});
-
-document.getElementById('reset-history').addEventListener('click', () => {
-  if (!confirm('This will wipe ALL logged history and sessions. Are you sure?')) return;
-  historyData = [];
-  workoutsData = {};
-  if (editingIndex !== null) cancelEdit();
-  saveData(); renderWorkouts(); showToast('🗑 All history cleared!');
 });
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
