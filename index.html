@@ -335,7 +335,7 @@
     <div class="section-label" id="sessions-label" style="display:none">Logged This Session</div>
     <div id="workout-list"></div>
     <button class="clear-btn" id="clear-btn">🗑 Clear All Sessions for This Day</button>
-    <button class="clear-btn" id="reset-history" style="margin-top:6px;color:var(--danger);opacity:0.7">⚠️ Reset ALL History (start fresh)</button>
+    <button class="clear-btn" id="reset-all-history" style="margin-top:6px;color:var(--danger);opacity:0.7">⚠️ Reset ALL History (start fresh)</button>
   </div>
 </div>
 
@@ -371,7 +371,7 @@
     <span class="export-icon">🖨</span>
     <span class="export-text"><strong>Print / Save as PDF</strong><span>Opens a print-friendly summary of all your sessions</span></span>
   </button>
-  <button class="export-btn" id="reset-history" style="border-color:var(--danger)">
+  <button class="export-btn" id="reset-history-export" style="border-color:var(--danger)">
     <span class="export-icon">🗑</span>
     <span class="export-text"><strong>Reset All History</strong><span>Wipe all logged sessions and start fresh</span></span>
   </button>
@@ -1157,7 +1157,14 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   saveData(); renderWorkouts(); showToast('Cleared!');
 });
 
-document.getElementById('reset-history').addEventListener('click', () => {
+document.getElementById('reset-all-history').addEventListener('click', () => {
+  if (!confirm('This will wipe ALL logged history and sessions. Are you sure?')) return;
+  historyData = [];
+  workoutsData = {};
+  if (editingIndex !== null) cancelEdit();
+  saveData(); renderWorkouts(); showToast('🗑 All history cleared!');
+});
+document.getElementById('reset-history-export').addEventListener('click', () => {
   if (!confirm('This will wipe ALL logged history and sessions. Are you sure?')) return;
   historyData = [];
   workoutsData = {};
