@@ -247,6 +247,10 @@
     <div class="tabs" id="day-tabs"></div>
   </div>
 
+  <div style="padding: 8px 16px 0; max-width: 720px; margin: 0 auto;">
+    <button onclick="if(confirm('Wipe ALL history and start fresh?')){historyData=[];workoutsData={};localStorage.removeItem(\'workoutsData\');localStorage.removeItem(\'historyData\');renderWorkouts();alert(\'Done! All data cleared.\');}" style="width:100%;padding:10px;background:rgba(255,78,106,0.1);border:1px solid var(--danger);color:var(--danger);border-radius:8px;font-family:\'DM Sans\',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;">⚠️ Reset ALL History (start fresh)</button>
+  </div>
+
   <div style="padding: 16px; max-width: 720px; margin: 0 auto;">
     <div class="card">
       <div class="card-title">Log a Set</div>
@@ -335,7 +339,7 @@
     <div class="section-label" id="sessions-label" style="display:none">Logged This Session</div>
     <div id="workout-list"></div>
     <button class="clear-btn" id="clear-btn">🗑 Clear All Sessions for This Day</button>
-    <button class="clear-btn" id="reset-all-history" style="margin-top:6px;color:var(--danger);opacity:0.7">⚠️ Reset ALL History (start fresh)</button>
+    <button class="clear-btn" id="reset-all-history" style="margin-top:6px;border-color:var(--danger);color:var(--danger)">⚠️ Reset ALL History (start fresh)</button>
   </div>
 </div>
 
