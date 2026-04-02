@@ -20,56 +20,60 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 0 0 80px; }
- 
+
   header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 2px; color: var(--accent); line-height: 1; }
   header .header-right { display: flex; gap: 10px; align-items: center; }
   .icon-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all 0.15s; white-space: nowrap; }
   .icon-btn:hover { background: var(--surface3); border-color: var(--accent); color: var(--accent); }
- 
+
   .tabs-wrapper { background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
   .tabs-wrapper::-webkit-scrollbar { display: none; }
   .tabs { display: flex; padding: 0 12px; gap: 2px; min-width: max-content; }
   .tab { padding: 12px 18px; background: none; color: var(--text2); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
   .tab:hover { color: var(--text); }
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
- 
+
   .view { display: none; padding: 16px; max-width: 720px; margin: 0 auto; }
   .view.active { display: block; }
- 
+
   .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; z-index: 100; }
   .nav-btn { flex: 1; padding: 14px 8px 10px; background: none; border: none; color: var(--text3); font-family: 'DM Sans', sans-serif; font-size: 0.7rem; font-weight: 500; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: color 0.15s; }
   .nav-btn svg { width: 20px; height: 20px; }
   .nav-btn.active { color: var(--accent); }
- 
+
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 14px; box-shadow: var(--card-shadow); }
   .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 1.5px; color: var(--text2); margin-bottom: 14px; }
- 
+
   .ex-row { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 10px; }
   .rest-badge { background: var(--surface3); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; color: var(--text2); white-space: nowrap; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 60px; text-align: center; }
   .rest-badge .rest-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); }
   .rest-badge span:last-child { color: var(--accent); font-weight: 600; font-size: 0.82rem; }
- 
+
   .ex-history-hint { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; font-size: 0.78rem; color: var(--text2); line-height: 1.5; }
   .ex-history-hint .hint-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 3px; }
   .ex-history-hint .hint-row { display: flex; gap: 12px; flex-wrap: wrap; }
   .ex-history-hint .hint-row span { display: flex; align-items: center; gap: 3px; }
- 
+
   .superset-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
   .superset-block-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 600; margin-bottom: 10px; }
- 
+
   .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
- 
+
   label.field { display: flex; flex-direction: column; gap: 5px; font-size: 0.75rem; color: var(--text2); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
   label.field select, label.field input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-size: 0.95rem; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.15s; width: 100%; -webkit-appearance: none; }
   label.field select:focus, label.field input:focus { border-color: var(--accent); }
   label.field select option { background: var(--surface2); }
- 
+
+  /* Rep range hint inside reps field */
+  .rep-range-hint { font-size: 0.68rem; color: var(--accent); font-weight: 600; letter-spacing: 0; text-transform: none; margin-bottom: 2px; }
+
   .submit-btn { width: 100%; padding: 13px; background: var(--accent); color: #0d0d0f; border: none; border-radius: 10px; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: 2px; cursor: pointer; margin-top: 14px; transition: opacity 0.15s, transform 0.1s; }
   .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
   .submit-btn:active { transform: translateY(0); }
- 
+  .submit-btn.editing { background: var(--accent2); }
+
   .exercise-plan-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
   .ex-badge { background: var(--surface3); border-radius: 8px; padding: 8px 10px; text-align: center; min-width: 50px; flex-shrink: 0; }
   .ex-badge .sets { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--accent); line-height: 1; }
@@ -78,7 +82,7 @@
   .ex-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 3px; }
   .ex-meta { font-size: 0.78rem; color: var(--text2); display: flex; gap: 10px; flex-wrap: wrap; }
   .ex-meta span { display: flex; align-items: center; gap: 3px; }
- 
+
   .session-item { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; animation: slideIn 0.2s ease; }
   @keyframes slideIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
   .session-item .s-info { flex: 1; min-width: 0; }
@@ -88,13 +92,16 @@
   .mood-Easy { background: rgba(200,241,53,0.15); color: var(--accent); }
   .mood-Stay { background: rgba(91,138,255,0.15); color: var(--accent2); }
   .mood-Hard { background: rgba(255,78,106,0.15); color: var(--danger); }
-  .del-btn { background: none; border: none; color: var(--text3); cursor: pointer; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; flex-shrink: 0; }
+
+  .item-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .del-btn, .edit-btn { background: none; border: none; color: var(--text3); cursor: pointer; padding: 4px; border-radius: 6px; transition: color 0.15s, background 0.15s; }
   .del-btn:hover { color: var(--danger); background: rgba(255,78,106,0.1); }
- 
+  .edit-btn:hover { color: var(--accent2); background: rgba(91,138,255,0.1); }
+
   .section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3); font-weight: 600; margin: 20px 0 10px; }
   .clear-btn { width: 100%; padding: 11px; background: none; border: 1px solid var(--border); color: var(--danger); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; margin-top: 14px; transition: background 0.15s; }
   .clear-btn:hover { background: rgba(255,78,106,0.08); }
- 
+
   .date-group { margin-bottom: 20px; }
   .date-header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text3); font-weight: 600; padding: 6px 0; border-bottom: 1px solid var(--border); margin-bottom: 10px; }
   .history-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; margin-bottom: 6px; font-size: 0.88rem; }
@@ -102,20 +109,20 @@
   .history-item .h-meta { font-size: 0.75rem; color: var(--text2); margin-top: 3px; }
   .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
   .empty-state .big { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 2px; margin-bottom: 8px; color: var(--text2); }
- 
+
   .pr-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; }
   .pr-icon { font-size: 1.6rem; flex-shrink: 0; }
   .pr-info { flex: 1; min-width: 0; }
   .pr-exercise { font-weight: 600; font-size: 0.95rem; }
   .pr-weight { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--accent); line-height: 1; }
   .pr-meta { font-size: 0.75rem; color: var(--text2); margin-top: 2px; }
- 
+
   .export-btn { width: 100%; padding: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; gap: 14px; transition: border-color 0.15s, background 0.15s; text-align: left; }
   .export-btn:hover { border-color: var(--accent); background: var(--surface2); }
   .export-btn .export-icon { font-size: 1.5rem; flex-shrink: 0; }
   .export-btn .export-text strong { display: block; margin-bottom: 2px; }
   .export-btn .export-text span { font-size: 0.8rem; color: var(--text2); }
- 
+
   /* CATEGORY BAR */
   .category-bar {
     display: grid;
@@ -153,20 +160,38 @@
   .cat-btn:hover { border-color: var(--accent); color: var(--text); }
   .cat-btn.active { border-color: var(--accent); background: var(--surface2); color: var(--accent); }
   .cat-btn.active .cat-sub { color: var(--accent); opacity: 0.7; }
- 
+
+  /* Edit mode banner */
+  .edit-banner {
+    background: rgba(91,138,255,0.12);
+    border: 1px solid rgba(91,138,255,0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    color: var(--accent2);
+    font-weight: 500;
+    margin-bottom: 12px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .edit-banner.show { display: flex; }
+  .cancel-edit-btn { margin-left: auto; background: none; border: none; color: var(--accent2); cursor: pointer; font-size: 0.8rem; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+  .cancel-edit-btn:hover { background: rgba(91,138,255,0.15); }
+
   #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--surface3); border: 1px solid var(--border); color: var(--text); padding: 10px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 200; white-space: nowrap; }
   #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
- 
+
 <header>
   <h1>💪 Lets Go!</h1>
   <div class="header-right">
     <button class="icon-btn" id="theme-toggle">☀️ Light</button>
   </div>
 </header>
- 
+
 <nav class="bottom-nav">
   <button class="nav-btn active" data-view="log">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M12 8v8"/></svg>
@@ -185,25 +210,32 @@
     Export
   </button>
 </nav>
- 
+
 <!-- LOG VIEW -->
 <div class="view active" id="view-log">
- 
+
   <!-- Category buttons -->
   <div class="category-bar">
     <button class="cat-btn active" data-cat="full">Full<span class="cat-sub">1 hour</span></button>
     <button class="cat-btn" data-cat="quick">Quick<span class="cat-sub">&lt;1 hour</span></button>
     <button class="cat-btn" data-cat="fallback">Fallback<span class="cat-sub">2-day split</span></button>
   </div>
- 
-  <!-- Day sub-tabs (change based on selected category) -->
+
+  <!-- Day sub-tabs -->
   <div class="tabs-wrapper">
     <div class="tabs" id="day-tabs"></div>
   </div>
- 
+
   <div style="padding: 16px; max-width: 720px; margin: 0 auto;">
     <div class="card">
       <div class="card-title">Log a Set</div>
+
+      <!-- Edit mode banner -->
+      <div class="edit-banner" id="edit-banner">
+        ✏️ Editing entry — make your changes below
+        <button class="cancel-edit-btn" id="cancel-edit-btn">✕ Cancel</button>
+      </div>
+
       <form id="workout-form">
         <div class="ex-row">
           <label class="field" style="flex:1">
@@ -215,7 +247,7 @@
             <span id="rest-value"></span>
           </div>
         </div>
- 
+
         <div id="superset-pickers" style="display:none">
           <div style="margin-bottom:10px">
             <label class="field" style="max-width:120px">
@@ -227,34 +259,39 @@
           <div id="superset-a-block" class="superset-block"></div>
           <div id="superset-b-block" class="superset-block"></div>
         </div>
- 
+
         <div id="ex-history-hint" class="ex-history-hint" style="display:none"></div>
- 
+
         <div id="normal-fields">
           <div class="form-row-3">
             <label class="field">Sets<input type="number" id="sets-input" placeholder="—" min="1" required readonly></label>
-            <label class="field">Reps<input type="number" id="reps-input" placeholder="e.g. 12" min="1" required></label>
+            <label class="field">
+              <span>Reps <span class="rep-range-hint" id="rep-range-hint"></span></span>
+              <input type="text" id="reps-input" placeholder="e.g. 12" required>
+            </label>
             <label class="field">Weight (lbs)<input type="number" id="weight-input" placeholder="0 = BW" min="0"></label>
           </div>
           <div class="form-row-3">
-            <label class="field">Side
-              <select id="side-input" required>
-                <option value="">Both</option>
-                <option value="Single Leg/Arm">Single</option>
-                <option value="Bilateral">Bilateral</option>
+            <label class="field">Load
+              <select id="side-input">
+                <option value="">—</option>
+                <option value="Uni">Uni</option>
+                <option value="Bi">Bi</option>
               </select>
             </label>
             <label class="field">Equipment
-              <select id="equip-input" required>
+              <select id="equip-input">
                 <option value="">—</option>
                 <option value="BB">Barbell</option>
                 <option value="DB">Dumbbell</option>
                 <option value="KB">Kettlebell</option>
+                <option value="Cable">Cable</option>
+                <option value="Machine">Machine</option>
                 <option value="BW">Bodyweight</option>
               </select>
             </label>
             <label class="field">Mood
-              <select id="mood-input" required>
+              <select id="mood-input">
                 <option value="">—</option>
                 <option value="Easy">😌 Easy</option>
                 <option value="Stay">😤 Stay</option>
@@ -263,10 +300,10 @@
             </label>
           </div>
         </div>
-        <button type="submit" class="submit-btn">+ Add Set</button>
+        <button type="submit" class="submit-btn" id="submit-btn">+ Add Set</button>
       </form>
     </div>
- 
+
     <div class="section-label">Today's Plan</div>
     <div id="plan-list"></div>
     <div class="section-label" id="sessions-label" style="display:none">Logged This Session</div>
@@ -274,19 +311,19 @@
     <button class="clear-btn" id="clear-btn">🗑 Clear All Sessions for This Day</button>
   </div>
 </div>
- 
+
 <!-- HISTORY VIEW -->
 <div class="view" id="view-history">
   <div class="section-label">Workout History</div>
   <div id="history-container"></div>
 </div>
- 
+
 <!-- PRs VIEW -->
 <div class="view" id="view-prs">
   <div class="section-label">Personal Records</div>
   <div id="pr-container"></div>
 </div>
- 
+
 <!-- EXPORT VIEW -->
 <div class="view" id="view-export">
   <div class="section-label">Export Your Data</div>
@@ -303,39 +340,39 @@
     <span class="export-text"><strong>Print / Save as PDF</strong><span>Opens a print-friendly summary of all your sessions</span></span>
   </button>
 </div>
- 
+
 <div id="toast"></div>
- 
+
 <script>
 // ─── EXERCISE DATA ────────────────────────────────────────────────────────────
 const preloadedExercises = {
- 
+
   // ── 1HR WORKOUTS ──────────────────────────────────────────────────────────
   day1_1hr: [
-    { name: 'Squat',           sets: 3, reps: '12-15',  rest: '2-3 min' },
-    { name: 'RDL',             sets: 3, reps: '6-8',    rest: '90 sec' },
-    { name: 'Incline DB Press',sets: 3, reps: '6-8',    rest: '75-90 sec' },
-    { name: 'Row',             sets: 3, reps: '8-10',   rest: '75-90 sec' },
-    { name: 'Plank',           sets: 2, reps: '60 sec', rest: '' }
+    { name: 'Squat',            sets: 3, reps: '12-15',  rest: '2-3 min' },
+    { name: 'RDL',              sets: 3, reps: '6-8',    rest: '90 sec' },
+    { name: 'Incline Bench',    sets: 3, reps: '6-8',    rest: '75-90 sec' },
+    { name: 'Row',              sets: 3, reps: '8-10',   rest: '75-90 sec' },
+    { name: 'Plank',            sets: 2, reps: '60 sec', rest: '' }
   ],
   day2_1hr: [
     { name: 'Pull-Ups or Lat Pulldown', sets: 4, reps: 'AMAP',   rest: '90-120 sec' },
-    { name: 'DB Bench',                 sets: 3, reps: '8-10',   rest: '120 sec' },
+    { name: 'Bench',                    sets: 3, reps: '8-10',   rest: '120 sec' },
     { name: 'Bulgarian Split Squat',    sets: 3, reps: '8 / leg',rest: '60 sec' },
     { name: 'Hamstring Curl',           sets: 2, reps: '10-12',  rest: '60 sec' },
     { name: 'Face Pulls',               sets: 2, reps: '12-15',  rest: '60 sec' }
   ],
   day3_1hr: [
-    { name: 'Squat',                    sets: 3, reps: '8-10',  rest: '90 sec' },
-    { name: 'Hip Thrust or Glute Bridge',sets: 3, reps: '8-12', rest: '90 sec' },
-    { name: 'Row',                      sets: 3, reps: '8-10',  rest: '90 sec' },
-    { name: 'Incline Bench',            sets: 3, reps: '8-10',  rest: '90 sec' },
+    { name: 'Squat',                     sets: 3, reps: '8-10',  rest: '90 sec' },
+    { name: 'Hip Thrust or Glute Bridge',sets: 3, reps: '8-12',  rest: '90 sec' },
+    { name: 'Row',                       sets: 3, reps: '8-10',  rest: '90 sec' },
+    { name: 'Incline Bench',             sets: 3, reps: '8-10',  rest: '90 sec' },
     { name: 'Bi/Tri Superset', sets: 2, reps: '10-12', rest: '60 sec', superset: true,
       supersetA: { label: '💪 Bicep',  options: ['EZ Bar Curl', 'DB Curl'] },
       supersetB: { label: '💪 Tricep', options: ['Rope Pulldown', 'OH Extension'] }
     }
   ],
- 
+
   // ── <1HR WORKOUTS ─────────────────────────────────────────────────────────
   day1_lt1hr: [
     { name: 'Squat', sets: 3, reps: '12-15', rest: '120 sec' },
@@ -367,7 +404,7 @@ const preloadedExercises = {
       supersetB: { label: '💪 Tricep', options: ['Rope Pulldown', 'OH Extension'] }
     }
   ],
- 
+
   // ── 2-DAY WORKOUTS ────────────────────────────────────────────────────────
   day1_of2: [
     { name: 'Squat',            sets: 4, reps: '12-15',  rest: '2 min' },
@@ -375,9 +412,9 @@ const preloadedExercises = {
       supersetA: { label: '🏋️ Chest', options: ['Incline DB Press'] },
       supersetB: { label: '🏋️ Back',  options: ['Row'] }
     },
-    { name: 'Romanian Deadlift', sets: 3, reps: '6-8',    rest: '75-90 sec' },
-    { name: 'Face Pulls',        sets: 1, reps: '15',      rest: '2 min' },
-    { name: 'Plank',             sets: 1, reps: '60+ sec', rest: '' }
+    { name: 'RDL',              sets: 3, reps: '6-8',    rest: '75-90 sec' },
+    { name: 'Face Pulls',       sets: 1, reps: '15',      rest: '2 min' },
+    { name: 'Plank',            sets: 1, reps: '60+ sec', rest: '' }
   ],
   day2_of2: [
     { name: 'Squat',                sets: 3, reps: '12-15',   rest: '90 sec' },
@@ -393,12 +430,13 @@ const preloadedExercises = {
     }
   ]
 };
- 
+
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let currentDay = 'day1_1hr';
 let workoutsData = {};
 let historyData  = [];
- 
+let editingIndex = null; // index in workoutsData[currentDay] being edited
+
 function loadData() {
   try { workoutsData = JSON.parse(localStorage.getItem('workoutsData') || '{}'); } catch(e) { workoutsData = {}; }
   try { historyData  = JSON.parse(localStorage.getItem('historyData')  || '[]'); } catch(e) { historyData  = []; }
@@ -408,14 +446,14 @@ function saveData() {
   localStorage.setItem('historyData',  JSON.stringify(historyData));
 }
 loadData();
- 
+
 // ─── TOAST ────────────────────────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2200);
 }
- 
+
 // ─── THEME ────────────────────────────────────────────────────────────────────
 const themeBtn = document.getElementById('theme-toggle');
 let isDark = localStorage.getItem('theme') !== 'light';
@@ -426,7 +464,7 @@ function applyTheme() {
 }
 applyTheme();
 themeBtn.addEventListener('click', () => { isDark = !isDark; applyTheme(); });
- 
+
 // ─── BOTTOM NAV ───────────────────────────────────────────────────────────────
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -438,7 +476,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     if (btn.dataset.view === 'prs')     renderPRs();
   });
 });
- 
+
 // ─── CATEGORY + DAY NAVIGATION ───────────────────────────────────────────────
 const categories = {
   full:     { days: [ { key: 'day1_1hr', label: 'Day 1' }, { key: 'day2_1hr', label: 'Day 2' }, { key: 'day3_1hr', label: 'Day 3' } ] },
@@ -446,7 +484,7 @@ const categories = {
   fallback: { days: [ { key: 'day1_of2', label: 'Day 1 of 2' }, { key: 'day2_of2', label: 'Day 2 of 2' } ] }
 };
 let currentCat = 'full';
- 
+
 function renderDayTabs(cat, selectDay) {
   const tabsEl = document.getElementById('day-tabs');
   tabsEl.innerHTML = '';
@@ -459,32 +497,32 @@ function renderDayTabs(cat, selectDay) {
       tabsEl.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       btn.classList.add('active');
       currentDay = d.key;
+      cancelEdit();
       populateExerciseDropdown();
       renderWorkouts();
     });
     tabsEl.appendChild(btn);
   });
-  // Select the right day
   const targetDay = selectDay || categories[cat].days[0].key;
   currentDay = targetDay;
   const targetBtn = tabsEl.querySelector(`[data-day="${targetDay}"]`);
   if (targetBtn) { tabsEl.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); targetBtn.classList.add('active'); }
 }
- 
+
 document.querySelectorAll('.cat-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentCat = btn.dataset.cat;
+    cancelEdit();
     renderDayTabs(currentCat);
     populateExerciseDropdown();
     renderWorkouts();
   });
 });
- 
-// Init day tabs
+
 renderDayTabs('full');
- 
+
 // ─── FORM ELEMENTS ────────────────────────────────────────────────────────────
 const exerciseInput = document.getElementById('exercise-input');
 const repsInput     = document.getElementById('reps-input');
@@ -494,9 +532,26 @@ const sideInput     = document.getElementById('side-input');
 const equipInput    = document.getElementById('equip-input');
 const moodInput     = document.getElementById('mood-input');
 const form          = document.getElementById('workout-form');
- 
+const submitBtn     = document.getElementById('submit-btn');
+const editBanner    = document.getElementById('edit-banner');
+
+// ─── CANCEL EDIT ─────────────────────────────────────────────────────────────
+function cancelEdit() {
+  editingIndex = null;
+  editBanner.classList.remove('show');
+  submitBtn.textContent = '+ Add Set';
+  submitBtn.classList.remove('editing');
+  form.reset();
+  populateExerciseDropdown();
+  updateExerciseDetails();
+}
+document.getElementById('cancel-edit-btn').addEventListener('click', cancelEdit);
+
 // ─── POPULATE DROPDOWN ────────────────────────────────────────────────────────
-function populateExerciseDropdown() {
+// Track which exercise index to advance to after logging
+let lastLoggedExerciseIndex = -1;
+
+function populateExerciseDropdown(targetExerciseName) {
   exerciseInput.innerHTML = '';
   const exercises = preloadedExercises[currentDay] || [];
   if (!exercises.length) {
@@ -511,9 +566,15 @@ function populateExerciseDropdown() {
     opt.value = ex.name; opt.textContent = ex.name;
     exerciseInput.appendChild(opt);
   });
+
+  // If a target exercise name is specified, select it
+  if (targetExerciseName) {
+    exerciseInput.value = targetExerciseName;
+  }
+
   updateExerciseDetails();
 }
- 
+
 // ─── BUILD SUPERSET BLOCK ─────────────────────────────────────────────────────
 function buildSupersetBlock(blockEl, side, config) {
   const optionsHtml = config.options.map(o => `<option value="${o}">${o}</option>`).join('');
@@ -528,7 +589,7 @@ function buildSupersetBlock(blockEl, side, config) {
       </label>
     </div>
     <div class="form-row-3" style="margin-bottom:8px">
-      <label class="field">Reps<input type="number" id="${side}-reps" placeholder="e.g. 12" min="1"></label>
+      <label class="field">Reps<input type="text" id="${side}-reps" placeholder="e.g. 12"></label>
       <label class="field">Weight (lbs)<input type="number" id="${side}-weight" placeholder="0 = BW" min="0"></label>
       <label class="field">Equipment
         <select id="${side}-equip">
@@ -536,16 +597,18 @@ function buildSupersetBlock(blockEl, side, config) {
           <option value="BB">Barbell</option>
           <option value="DB">Dumbbell</option>
           <option value="KB">Kettlebell</option>
+          <option value="Cable">Cable</option>
+          <option value="Machine">Machine</option>
           <option value="BW">Bodyweight</option>
         </select>
       </label>
     </div>
     <div class="form-row-2">
-      <label class="field">Side
+      <label class="field">Load
         <select id="${side}-side">
-          <option value="">Both</option>
-          <option value="Single Leg/Arm">Single</option>
-          <option value="Bilateral">Bilateral</option>
+          <option value="">—</option>
+          <option value="Uni">Uni</option>
+          <option value="Bi">Bi</option>
         </select>
       </label>
       <label class="field">Mood
@@ -562,33 +625,46 @@ function buildSupersetBlock(blockEl, side, config) {
   }
   blockEl.querySelector(`#${side}-input`).addEventListener('change', updateExerciseDetails);
 }
- 
+
 // ─── UPDATE EXERCISE DETAILS ──────────────────────────────────────────────────
 function updateExerciseDetails() {
   const ex = (preloadedExercises[currentDay] || []).find(e => e.name === exerciseInput.value);
   const supersetPickers = document.getElementById('superset-pickers');
   const normalFields    = document.getElementById('normal-fields');
- 
+  const repHint         = document.getElementById('rep-range-hint');
+
   if (!ex) {
     document.getElementById('rest-badge').style.display = 'none';
     document.getElementById('ex-history-hint').style.display = 'none';
     supersetPickers.style.display = 'none';
     normalFields.style.display = 'block';
+    if (repHint) repHint.textContent = '';
     return;
   }
   setsInput.value = ex.sets;
- 
+
   if (ex.superset) {
     supersetPickers.style.display = 'block';
     normalFields.style.display = 'none';
     document.getElementById('superset-sets-input').value = ex.sets;
     buildSupersetBlock(document.getElementById('superset-a-block'), 'ss-a', ex.supersetA);
     buildSupersetBlock(document.getElementById('superset-b-block'), 'ss-b', ex.supersetB);
+    // Pre-fill superset rep ranges
+    const aReps = document.getElementById('ss-a-reps');
+    const bReps = document.getElementById('ss-b-reps');
+    if (aReps && !aReps.value) aReps.placeholder = ex.reps;
+    if (bReps && !bReps.value) bReps.placeholder = ex.reps;
   } else {
     supersetPickers.style.display = 'none';
     normalFields.style.display = 'block';
+    // Auto-populate rep range as hint + placeholder
+    if (repHint) repHint.textContent = `target: ${ex.reps}`;
+    if (!repsInput.dataset.userEdited) {
+      repsInput.value = '';
+      repsInput.placeholder = ex.reps;
+    }
   }
- 
+
   // Rest badge
   const restBadge = document.getElementById('rest-badge');
   if (ex.rest) {
@@ -597,7 +673,7 @@ function updateExerciseDetails() {
   } else {
     restBadge.style.display = 'none';
   }
- 
+
   // History hint
   const hint = document.getElementById('ex-history-hint');
   let lastEntry;
@@ -617,7 +693,7 @@ function updateExerciseDetails() {
       <div class="hint-row">
         <span>📋 ${lastEntry.sets} sets × ${lastEntry.reps} reps</span>
         <span>⚖️ ${lastEntry.weight > 0 ? lastEntry.weight + ' lbs' : 'BW'}</span>
-        <span>↔️ ${lastEntry.side || 'Both'}</span>
+        <span>↔️ ${lastEntry.side || '—'}</span>
         <span>🏋️ ${lastEntry.equipment}</span>
         <span class="mood-chip mood-${lastEntry.mood}">${lastEntry.mood}</span>
       </div>`;
@@ -625,14 +701,30 @@ function updateExerciseDetails() {
     hint.style.display = 'none';
   }
 }
-exerciseInput.addEventListener('change', updateExerciseDetails);
- 
+exerciseInput.addEventListener('change', () => {
+  repsInput.dataset.userEdited = '';
+  updateExerciseDetails();
+});
+repsInput.addEventListener('input', () => {
+  repsInput.dataset.userEdited = repsInput.value ? 'yes' : '';
+});
+
 // ─── HELPER ───────────────────────────────────────────────────────────────────
 function getVal(id, fallback = '') {
   const el = document.getElementById(id);
   return el ? el.value || fallback : fallback;
 }
- 
+
+// ─── GET NEXT EXERCISE NAME ───────────────────────────────────────────────────
+function getNextExerciseName(currentExName) {
+  const exercises = preloadedExercises[currentDay] || [];
+  const idx = exercises.findIndex(e => e.name === currentExName);
+  if (idx >= 0 && idx < exercises.length - 1) {
+    return exercises[idx + 1].name;
+  }
+  return null; // already at last exercise
+}
+
 // ─── FORM SUBMIT ──────────────────────────────────────────────────────────────
 form.addEventListener('submit', e => {
   e.preventDefault();
@@ -640,40 +732,103 @@ form.addEventListener('submit', e => {
   const date = new Date().toISOString().split('T')[0];
   const ex = (preloadedExercises[currentDay] || []).find(e => e.name === exercise);
   if (!workoutsData[currentDay]) workoutsData[currentDay] = [];
- 
+
   if (ex && ex.superset) {
     const aVal = getVal('ss-a-input');
     const bVal = getVal('ss-b-input');
     if (!aVal || !bVal) { showToast('⚠️ Please select both exercises'); return; }
     const sets = document.getElementById('superset-sets-input').value;
-    const aEntry = { exercise: aVal, sets, reps: getVal('ss-a-reps','0'), weight: getVal('ss-a-weight','0'), equipment: getVal('ss-a-equip','BW'), side: getVal('ss-a-side','Both'), mood: getVal('ss-a-mood','Stay'), date };
-    const bEntry = { exercise: bVal, sets, reps: getVal('ss-b-reps','0'), weight: getVal('ss-b-weight','0'), equipment: getVal('ss-b-equip','BW'), side: getVal('ss-b-side','Both'), mood: getVal('ss-b-mood','Stay'), date };
-    workoutsData[currentDay].push(aEntry, bEntry);
-    historyData.push({ ...aEntry, day: currentDay }, { ...bEntry, day: currentDay });
-    showToast('✅ Superset logged!');
+    const aEntry = { exercise: aVal, sets, reps: getVal('ss-a-reps','0'), weight: getVal('ss-a-weight','0'), equipment: getVal('ss-a-equip','BW'), side: getVal('ss-a-side',''), mood: getVal('ss-a-mood','Stay'), date };
+    const bEntry = { exercise: bVal, sets, reps: getVal('ss-b-reps','0'), weight: getVal('ss-b-weight','0'), equipment: getVal('ss-b-equip','BW'), side: getVal('ss-b-side',''), mood: getVal('ss-b-mood','Stay'), date };
+
+    if (editingIndex !== null) {
+      // Replace the two superset entries at editingIndex and editingIndex+1
+      workoutsData[currentDay].splice(editingIndex, 2, aEntry, bEntry);
+      // Update historyData too
+      const hiA = historyData.findIndex(h => h.day === currentDay && h.date === date && h.exercise === aEntry.exercise);
+      if (hiA >= 0) historyData[hiA] = { ...aEntry, day: currentDay };
+      const hiB = historyData.findIndex(h => h.day === currentDay && h.date === date && h.exercise === bEntry.exercise);
+      if (hiB >= 0) historyData[hiB] = { ...bEntry, day: currentDay };
+      showToast('✏️ Superset updated!');
+      cancelEdit();
+    } else {
+      workoutsData[currentDay].push(aEntry, bEntry);
+      historyData.push({ ...aEntry, day: currentDay }, { ...bEntry, day: currentDay });
+      showToast('✅ Superset logged!');
+      const nextEx = getNextExerciseName(exercise);
+      saveData(); renderWorkouts();
+      populateExerciseDropdown(nextEx || exercise);
+      return;
+    }
   } else {
     const entry = {
-      exercise, reps: repsInput.value, sets: setsInput.value,
-      weight: weightInput.value || '0', side: sideInput.value || 'Both',
-      equipment: equipInput.value || 'BW', mood: moodInput.value, date
+      exercise,
+      reps: repsInput.value,
+      sets: setsInput.value,
+      weight: weightInput.value || '0',
+      side: sideInput.value || '',
+      equipment: equipInput.value || 'BW',
+      mood: moodInput.value,
+      date
     };
-    workoutsData[currentDay].push(entry);
-    historyData.push({ ...entry, day: currentDay });
-    showToast('✅ Set logged!');
+
+    if (editingIndex !== null) {
+      // Update the session entry
+      const oldExercise = workoutsData[currentDay][editingIndex].exercise;
+      workoutsData[currentDay][editingIndex] = entry;
+      // Update history entry too
+      const hi = historyData.findIndex(h => h.day === currentDay && h.date === date && h.exercise === oldExercise);
+      if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
+      showToast('✏️ Entry updated!');
+      cancelEdit();
+    } else {
+      const nextEx = getNextExerciseName(exercise);
+      workoutsData[currentDay].push(entry);
+      historyData.push({ ...entry, day: currentDay });
+      showToast('✅ Set logged!');
+      saveData(); renderWorkouts();
+      repsInput.dataset.userEdited = '';
+      populateExerciseDropdown(nextEx || exercise);
+      return;
+    }
   }
- 
+
   saveData();
   renderWorkouts();
-  form.reset();
-  populateExerciseDropdown();
-  updateExerciseDetails();
 });
- 
+
+// ─── ENTER EDIT MODE ──────────────────────────────────────────────────────────
+function startEdit(index) {
+  const sessions = workoutsData[currentDay] || [];
+  const entry = sessions[index];
+  if (!entry) return;
+
+  editingIndex = index;
+  editBanner.classList.add('show');
+  submitBtn.textContent = '💾 Save Changes';
+  submitBtn.classList.add('editing');
+
+  // Select the exercise
+  exerciseInput.value = entry.exercise;
+  updateExerciseDetails();
+
+  // Fill in fields
+  repsInput.value = entry.reps;
+  repsInput.dataset.userEdited = 'yes';
+  weightInput.value = entry.weight > 0 ? entry.weight : '';
+  sideInput.value = entry.side || '';
+  equipInput.value = entry.equipment || '';
+  moodInput.value = entry.mood || '';
+
+  // Scroll to form
+  document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 // ─── RENDER WORKOUTS ──────────────────────────────────────────────────────────
 function renderWorkouts() {
   const exercises = preloadedExercises[currentDay] || [];
   const sessions  = workoutsData[currentDay] || [];
- 
+
   const planList = document.getElementById('plan-list');
   planList.innerHTML = '';
   if (!exercises.length) {
@@ -696,7 +851,7 @@ function renderWorkouts() {
         </div>`;
     });
   }
- 
+
   const wList  = document.getElementById('workout-list');
   const sLabel = document.getElementById('sessions-label');
   wList.innerHTML = '';
@@ -712,17 +867,27 @@ function renderWorkouts() {
             <span>${s.sets} sets × ${s.reps} reps</span>
             ${s.weight > 0 ? `<span>· ${s.weight} lbs</span>` : ''}
             <span>· ${s.equipment}</span>
+            ${s.side ? `<span>· ${s.side}</span>` : ''}
             <span class="mood-chip mood-${s.mood}">${s.mood}</span>
           </div>
         </div>
-        <button class="del-btn" data-index="${i}" title="Delete">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-        </button>`;
+        <div class="item-actions">
+          <button class="edit-btn" data-index="${i}" title="Edit">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="del-btn" data-index="${i}" title="Delete">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </button>
+        </div>`;
       wList.appendChild(div);
+    });
+    wList.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => startEdit(parseInt(btn.dataset.index)));
     });
     wList.querySelectorAll('.del-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         workoutsData[currentDay].splice(parseInt(btn.dataset.index), 1);
+        if (editingIndex !== null) cancelEdit();
         saveData(); renderWorkouts(); showToast('🗑 Deleted');
       });
     });
@@ -730,7 +895,7 @@ function renderWorkouts() {
     sLabel.style.display = 'none';
   }
 }
- 
+
 // ─── HISTORY ──────────────────────────────────────────────────────────────────
 function renderHistory() {
   const container = document.getElementById('history-container');
@@ -753,13 +918,13 @@ function renderHistory() {
       grp.innerHTML += `
         <div class="history-item">
           <strong>${s.exercise}</strong> — ${s.sets}×${s.reps} @ ${s.weight > 0 ? s.weight + ' lbs' : 'BW'}
-          <div class="h-meta">${s.equipment} · ${s.side} · <span class="mood-chip mood-${s.mood}">${s.mood}</span></div>
+          <div class="h-meta">${s.equipment}${s.side ? ' · ' + s.side : ''} · <span class="mood-chip mood-${s.mood}">${s.mood}</span></div>
         </div>`;
     });
     container.appendChild(grp);
   });
 }
- 
+
 // ─── PRs ──────────────────────────────────────────────────────────────────────
 function renderPRs() {
   const container = document.getElementById('pr-container');
@@ -789,11 +954,11 @@ function renderPRs() {
       </div>`;
   });
 }
- 
+
 // ─── EXPORT ───────────────────────────────────────────────────────────────────
 document.getElementById('export-csv').addEventListener('click', () => {
   if (!historyData.length) { showToast('No data to export yet!'); return; }
-  const header = ['Date','Day','Exercise','Sets','Reps','Weight(lbs)','Side','Equipment','Mood'];
+  const header = ['Date','Day','Exercise','Sets','Reps','Weight(lbs)','Load','Equipment','Mood'];
   const rows = historyData.map(s => [s.date, s.day, s.exercise, s.sets, s.reps, s.weight, s.side, s.equipment, s.mood]);
   const csv = [header, ...rows].map(r => r.join(',')).join('\n');
   download('workout_data.csv', 'text/csv', csv);
@@ -823,14 +988,15 @@ function download(filename, type, content) {
   a.href = URL.createObjectURL(new Blob([content], { type }));
   a.download = filename; a.click();
 }
- 
+
 // ─── CLEAR ────────────────────────────────────────────────────────────────────
 document.getElementById('clear-btn').addEventListener('click', () => {
   if (!confirm('Clear all logged sessions for this day?')) return;
   workoutsData[currentDay] = [];
+  if (editingIndex !== null) cancelEdit();
   saveData(); renderWorkouts(); showToast('Cleared!');
 });
- 
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 populateExerciseDropdown();
 renderWorkouts();
