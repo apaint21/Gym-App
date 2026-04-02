@@ -837,10 +837,10 @@ form.addEventListener('submit', e => {
       const oldDate = oldEntry.date;
       workoutsData[currentDay][editingIndex] = entry;
 
-      // If date changed, migrate ALL history entries for this day to the new date
+      // If date changed, migrate ALL history entries logged on that date to the new date
       if (oldDate !== date) {
         historyData.forEach(h => {
-          if (h.day === currentDay && h.date === oldDate) h.date = date;
+          if (h.date === oldDate) h.date = date;
         });
         // Also update all workoutsData entries for this day
         (workoutsData[currentDay] || []).forEach(w => {
@@ -848,7 +848,7 @@ form.addEventListener('submit', e => {
         });
       } else {
         // Date unchanged — just update the specific history entry
-        const hi = historyData.findIndex(h => h.day === currentDay && h.date === oldDate && h.exercise === oldExercise);
+        const hi = historyData.findIndex(h => h.date === oldDate && h.exercise === oldExercise);
         if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
       }
       showToast('✏️ Entry updated!');
