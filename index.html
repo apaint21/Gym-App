@@ -9,7 +9,7 @@
   :root[data-theme="dark"] {
     --bg: #0d0d0f; --surface: #16161a; --surface2: #1e1e24; --surface3: #26262e;
     --border: #2e2e38; --accent: #c8f135; --accent2: #5b8aff; --text: #f0f0f5;
-    --text2: #9898a8; --texat3: #5a5a70; --danger: #ff4e6a; --success: #c8f135;
+    --text2: #9898a8; --text3: #5a5a70; --danger: #ff4e6a; --success: #c8f135;
     --card-shadow: 0 2px 12px rgba(0,0,0,0.5);
   }
   :root[data-theme="light"] {
@@ -50,10 +50,11 @@
   .rest-badge .rest-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); }
   .rest-badge span:last-child { color: var(--accent); font-weight: 600; font-size: 0.82rem; }
 
-  .ex-history-hint { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; font-size: 0.78rem; color: var(--text2); line-height: 1.5; }
+  .ex-history-hint { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; margin-bottom: 10px; font-size: 0.75rem; color: var(--text3); line-height: 1.5; }
   .ex-history-hint .hint-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); margin-bottom: 3px; }
   .ex-history-hint .hint-row { display: flex; gap: 12px; flex-wrap: wrap; }
   .ex-history-hint .hint-row span { display: flex; align-items: center; gap: 3px; }
+  .hint-simple { font-size: 0.75rem; color: var(--text3); padding: 4px 0 8px; }
 
   .superset-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
   .superset-block-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 600; margin-bottom: 10px; }
@@ -622,11 +623,25 @@ function populateExerciseDropdown(targetExerciseName) {
 }
 
 // ─── BUILD SUPERSET BLOCK ─────────────────────────────────────────────────────
+// ─── SIMPLE HINT STRING ──────────────────────────────────────────────────────
+function getSimpleHint(exName) {
+  if (!exName) return '';
+  const entry = [...historyData].sort((a,b) => (b.date||'').localeCompare(a.date||'')).find(h => h.exercise === exName);
+  if (!entry) return '';
+  const parts = [entry.sets + '×' + entry.reps];
+  if (entry.weight > 0) parts.push(entry.weight + ' lbs');
+  else parts.push('BW');
+  if (entry.equipment) parts.push(entry.equipment);
+  if (entry.side) parts.push(entry.side);
+  if (entry.mood) parts.push(entry.mood);
+  return 'last logged: ' + parts.join(' · ');
+}
+
 function buildSupersetBlock(blockEl, side, config) {
   const optionsHtml = config.options.map(o => `<option value="${o}">${o}</option>`).join('');
   blockEl.innerHTML = `
     <div class="superset-block-label">${config.label}</div>
-    <div style="margin-bottom:8px">
+    <div style="margin-bottom:4px">
       <label class="field">Exercise
         <select id="${side}-input">
           ${config.options.length > 1 ? '<option value="">— Select —</option>' : ''}
@@ -634,6 +649,7 @@ function buildSupersetBlock(blockEl, side, config) {
         </select>
       </label>
     </div>
+    <div id="${side}-hint" class="hint-simple"></div>
     <div class="form-row-3" style="margin-bottom:8px">
       <label class="field">Reps<input type="text" id="${side}-reps" placeholder="e.g. 12"></label>
       <label class="field">Weight (lbs)<input type="number" id="${side}-weight" placeholder="0 = BW" min="0"></label>
@@ -669,7 +685,14 @@ function buildSupersetBlock(blockEl, side, config) {
   if (config.options.length === 1) {
     blockEl.querySelector(`#${side}-input`).value = config.options[0];
   }
-  blockEl.querySelector(`#${side}-input`).addEventListener('change', updateExerciseDetails);
+  // Update hint immediately after building
+  const hintEl = blockEl.querySelector(`#${side}-hint`);
+  if (hintEl) hintEl.textContent = getSimpleHint(blockEl.querySelector(`#${side}-input`).value);
+  // Update hint when exercise selection changes (without rebuilding blocks)
+  blockEl.querySelector(`#${side}-input`).addEventListener('change', function() {
+    const h = document.getElementById(side + '-hint');
+    if (h) h.textContent = getSimpleHint(this.value);
+  });
 }
 
 // ─── UPDATE EXERCISE DETAILS ──────────────────────────────────────────────────
@@ -711,7 +734,7 @@ function updateExerciseDetails() {
     if (repHint) repHint.textContent = `target: ${ex.reps}`;
     // Pre-fill reps from last session if not user-edited
     if (!repsInput.dataset.userEdited) {
-      const lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name);
+      const lastEntry = [...historyData].sort((a,b) => (b.date||'').localeCompare(a.date||'')).find(h => h.exercise === ex.name);
       if (lastEntry) {
         repsInput.value = lastEntry.reps;
         repsInput.dataset.userEdited = 'prefill';
@@ -740,20 +763,11 @@ function updateExerciseDetails() {
     const lookFor = (aEl && aEl.value) || (bEl && bEl.value) || null;
     lastEntry = lookFor ? [...historyData].reverse().find(h => h.exercise === lookFor) : null;
   } else {
-    lastEntry = [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
+    lastEntry = [...historyData].sort((a,b) => (b.date||'').localeCompare(a.date||'')).find(h => h.exercise === ex.name) || null;
   }
   if (lastEntry) {
-    const d = new Date(lastEntry.date + 'T12:00:00');
     hint.style.display = 'block';
-    hint.innerHTML = `
-      <div class="hint-label">Last logged — ${d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</div>
-      <div class="hint-row">
-        <span>📋 ${lastEntry.sets} sets × ${lastEntry.reps} reps</span>
-        <span>⚖️ ${lastEntry.weight > 0 ? lastEntry.weight + ' lbs' : 'BW'}</span>
-        <span>↔️ ${lastEntry.side || '—'}</span>
-        <span>🏋️ ${lastEntry.equipment}</span>
-        <span class="mood-chip mood-${lastEntry.mood}">${lastEntry.mood}</span>
-      </div>`;
+    hint.textContent = getSimpleHint(ex.name);
     // Pre-fill weight from last session if not editing and field is empty
     if (!ex.superset && editingIndex === null && weightInput && !weightInput.dataset.userEdited) {
       weightInput.value = lastEntry.weight > 0 ? lastEntry.weight : '';
