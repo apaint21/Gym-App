@@ -693,8 +693,12 @@ function updateExerciseDetails() {
     supersetPickers.style.display = 'block';
     normalFields.style.display = 'none';
     document.getElementById('superset-sets-input').value = ex.sets;
-    buildSupersetBlock(document.getElementById('superset-a-block'), 'ss-a', ex.supersetA);
-    buildSupersetBlock(document.getElementById('superset-b-block'), 'ss-b', ex.supersetB);
+    // Only rebuild blocks when switching to a different superset — prevents blink when selecting within a block
+    if (supersetPickers.dataset.builtFor !== ex.name) {
+      supersetPickers.dataset.builtFor = ex.name;
+      buildSupersetBlock(document.getElementById('superset-a-block'), 'ss-a', ex.supersetA);
+      buildSupersetBlock(document.getElementById('superset-b-block'), 'ss-b', ex.supersetB);
+    }
     // Pre-fill superset rep ranges
     const aReps = document.getElementById('ss-a-reps');
     const bReps = document.getElementById('ss-b-reps');
@@ -761,6 +765,7 @@ function updateExerciseDetails() {
 exerciseInput.addEventListener('change', () => {
   repsInput.dataset.userEdited = '';
   weightInput.dataset.userEdited = '';
+  document.getElementById('superset-pickers').dataset.builtFor = '';
   updateExerciseDetails();
 });
 repsInput.addEventListener('input', () => {
@@ -1169,3 +1174,4 @@ renderWorkouts();
 </script>
 </body>
 </html>
+
