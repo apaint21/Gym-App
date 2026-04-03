@@ -374,7 +374,6 @@
     <span class="export-icon">⚠️</span>
     <span class="export-text"><strong style="color:var(--danger)">Reset All History</strong><span>Wipe all logged sessions and start fresh</span></span>
   </button>
-
 </div>
 
 <div id="toast"></div>
@@ -624,18 +623,13 @@ function populateExerciseDropdown(targetExerciseName) {
 
 // ─── BUILD SUPERSET BLOCK ─────────────────────────────────────────────────────
 function buildSupersetBlock(blockEl, side, config) {
-  // For single-option selects, mark the option as selected directly in HTML (more reliable on iOS)
-  const optionsHtml = config.options.map((o, i) =>
-    `<option value="${o}"${config.options.length === 1 || i === 0 && config.options.length === 1 ? ' selected' : ''}>${o}</option>`
-  ).join('');
-  const blankOption = config.options.length > 1 ? '<option value="">— Select —</option>' : '';
+  const optionsHtml = config.options.map(o => `<option value="${o}">${o}</option>`).join('');
   blockEl.innerHTML = `
     <div class="superset-block-label">${config.label}</div>
-    <div id="${side}-history-hint" class="ex-history-hint" style="display:none"></div>
     <div style="margin-bottom:8px">
       <label class="field">Exercise
         <select id="${side}-input">
-          ${blankOption}
+          ${config.options.length > 1 ? '<option value="">— Select —</option>' : ''}
           ${optionsHtml}
         </select>
       </label>
@@ -672,35 +666,10 @@ function buildSupersetBlock(blockEl, side, config) {
         </select>
       </label>
     </div>`;
-  // Change listener updates history hint without rebuilding blocks
-  blockEl.querySelector(`#${side}-input`).addEventListener('change', function() {
-    renderSupersetHistoryHints(null, side);
-  });
-}
-
-// ─── SUPERSET HISTORY HINTS ───────────────────────────────────────────────────
-function renderSupersetHistoryHints(ex, onlySide) {
-  ['ss-a', 'ss-b'].forEach(function(side) {
-    if (onlySide && onlySide !== side) return;
-    const inputEl = document.getElementById(side + '-input');
-    const hintEl  = document.getElementById(side + '-history-hint');
-    if (!inputEl || !hintEl) return;
-    const exName = inputEl.value;
-    if (!exName) { hintEl.style.display = 'none'; return; }
-    const entry = [...historyData].reverse().find(function(h) { return h.exercise === exName; });
-    if (!entry) { hintEl.style.display = 'none'; return; }
-    const d = new Date(entry.date + 'T12:00:00');
-    hintEl.style.display = 'block';
-    hintEl.innerHTML =
-      '<div class="hint-label">Last logged — ' + d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) + '</div>' +
-      '<div class="hint-row">' +
-        '<span>📋 ' + entry.sets + ' sets × ' + entry.reps + ' reps</span>' +
-        '<span>⚖️ ' + (entry.weight > 0 ? entry.weight + ' lbs' : 'BW') + '</span>' +
-        '<span>↔️ ' + (entry.side || '—') + '</span>' +
-        '<span>🏋️ ' + entry.equipment + '</span>' +
-        '<span class="mood-chip mood-' + entry.mood + '">' + entry.mood + '</span>' +
-      '</div>';
-  });
+  if (config.options.length === 1) {
+    blockEl.querySelector(`#${side}-input`).value = config.options[0];
+  }
+  blockEl.querySelector(`#${side}-input`).addEventListener('change', updateExerciseDetails);
 }
 
 // ─── UPDATE EXERCISE DETAILS ──────────────────────────────────────────────────
@@ -724,20 +693,13 @@ function updateExerciseDetails() {
     supersetPickers.style.display = 'block';
     normalFields.style.display = 'none';
     document.getElementById('superset-sets-input').value = ex.sets;
-    // Only rebuild superset blocks if the superset exercise has changed — prevents blink/loop
-    const supersetPickers = document.getElementById('superset-pickers');
-    if (supersetPickers.dataset.builtFor !== ex.name) {
-      supersetPickers.dataset.builtFor = ex.name;
-      buildSupersetBlock(document.getElementById('superset-a-block'), 'ss-a', ex.supersetA);
-      buildSupersetBlock(document.getElementById('superset-b-block'), 'ss-b', ex.supersetB);
-    }
+    buildSupersetBlock(document.getElementById('superset-a-block'), 'ss-a', ex.supersetA);
+    buildSupersetBlock(document.getElementById('superset-b-block'), 'ss-b', ex.supersetB);
     // Pre-fill superset rep ranges
     const aReps = document.getElementById('ss-a-reps');
     const bReps = document.getElementById('ss-b-reps');
     if (aReps && !aReps.value) aReps.placeholder = ex.reps;
     if (bReps && !bReps.value) bReps.placeholder = ex.reps;
-    // Show per-exercise history hints inside each superset block
-    renderSupersetHistoryHints(ex);
   } else {
     supersetPickers.style.display = 'none';
     normalFields.style.display = 'block';
@@ -745,13 +707,9 @@ function updateExerciseDetails() {
     if (repHint) repHint.textContent = `target: ${ex.reps}`;
     // Pre-fill reps from last session if not user-edited
     if (!repsInput.dataset.userEdited) {
-      const wdReps = (workoutsData[currentDay] || []).filter(w => w.exercise === ex.name);
-      const wdRepEntry = wdReps[wdReps.length - 1] || null;
-      const lastRepsEntry = wdRepEntry && wdRepEntry._id
-        ? historyData.find(h => h._id === wdRepEntry._id) || null
-        : [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
-      if (lastRepsEntry) {
-        repsInput.value = lastRepsEntry.reps;
+      const lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name);
+      if (lastEntry) {
+        repsInput.value = lastEntry.reps;
         repsInput.dataset.userEdited = 'prefill';
       } else {
         repsInput.value = '';
@@ -769,20 +727,16 @@ function updateExerciseDetails() {
     restBadge.style.display = 'none';
   }
 
-  // History hint (superset hints are handled per-block by renderSupersetHistoryHints)
+  // History hint
   const hint = document.getElementById('ex-history-hint');
-  if (ex.superset) { hint.style.display = 'none'; } // handled per-block
   let lastEntry;
   if (ex.superset) {
-    lastEntry = null;
+    const aEl = document.getElementById('ss-a-input');
+    const bEl = document.getElementById('ss-b-input');
+    const lookFor = (aEl && aEl.value) || (bEl && bEl.value) || null;
+    lastEntry = lookFor ? [...historyData].reverse().find(h => h.exercise === lookFor) : null;
   } else {
-    // Find the most recent workoutsData entry for this exercise on this day,
-    // then look it up in historyData by _id so we always show the right one
-    const wdEntries = (workoutsData[currentDay] || []).filter(w => w.exercise === ex.name);
-    const wdEntry = wdEntries[wdEntries.length - 1] || null;
-    lastEntry = wdEntry && wdEntry._id
-      ? historyData.find(h => h._id === wdEntry._id) || null
-      : [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
+    lastEntry = [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
   }
   if (lastEntry) {
     const d = new Date(lastEntry.date + 'T12:00:00');
@@ -807,8 +761,6 @@ function updateExerciseDetails() {
 exerciseInput.addEventListener('change', () => {
   repsInput.dataset.userEdited = '';
   weightInput.dataset.userEdited = '';
-  // Clear the superset guard so switching exercises always rebuilds blocks
-  document.getElementById('superset-pickers').dataset.builtFor = '';
   updateExerciseDetails();
 });
 repsInput.addEventListener('input', () => {
@@ -891,8 +843,6 @@ form.addEventListener('submit', e => {
       workoutsData[currentDay][editingIndex] = entry;
 
       // If date changed, migrate only entries from the same day-tab and same old date
-      // Always carry the _id forward so we can find it in historyData
-      if (oldEntry._id) entry._id = oldEntry._id;
       if (oldDate !== date) {
         historyData.forEach(h => {
           if (h.day === currentDay && h.date === oldDate) h.date = date;
@@ -900,19 +850,17 @@ form.addEventListener('submit', e => {
         (workoutsData[currentDay] || []).forEach(w => {
           if (w.date === oldDate) w.date = date;
         });
+      } else {
+        // Date unchanged — just update this specific history entry
+        const hi = historyData.findIndex(h => h.day === currentDay && h.date === oldDate && h.exercise === oldExercise);
+        if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
       }
-      // Update historyData — use _id if available, otherwise fall back to field match
-      const hi = oldEntry._id
-        ? historyData.findIndex(h => h._id === oldEntry._id)
-        : (() => { let i = historyData.length - 1; for (; i >= 0; i--) { const h = historyData[i]; if (h.day === currentDay && h.date === oldDate && h.exercise === oldExercise) break; } return i; })();
-      if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
       showToast('✏️ Entry updated!');
       cancelEdit(exercise);
       saveData(); renderWorkouts();
       return;
     } else {
       const nextEx = getNextExerciseName(exercise);
-      entry._id = Date.now() + '-' + Math.random();
       workoutsData[currentDay].push(entry);
       historyData.push({ ...entry, day: currentDay });
       showToast('✅ Set logged!');
@@ -927,7 +875,6 @@ form.addEventListener('submit', e => {
 
   saveData();
   renderWorkouts();
-  updateExerciseDetails();
 });
 
 // ─── ENTER EDIT MODE ──────────────────────────────────────────────────────────
@@ -1028,7 +975,6 @@ function renderWorkouts() {
         const idx = parseInt(btn.dataset.index);
         const deleted = workoutsData[currentDay][idx];
         workoutsData[currentDay].splice(idx, 1);
-        // Remove the matching entry from historyData so the calendar and hint stay in sync
         const hiIdx = historyData.findIndex(h => h.day === currentDay && h.date === deleted.date && h.exercise === deleted.exercise);
         if (hiIdx >= 0) historyData.splice(hiIdx, 1);
         if (editingIndex !== null) cancelEdit();
@@ -1216,13 +1162,6 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   if (editingIndex !== null) cancelEdit();
   saveData(); renderWorkouts(); showToast('Cleared!');
 });
-
-
-  var out = entries.length
-    ? entries.map(function(h, i) {
-        return i + ': day=' + h.day + '  date=' + h.date + '  reps=' + h.reps + '  weight=' + h.weight + '  equip=' + h.equipment + '  mood=' + h.mood;
-      }).join('\n')
-    : 'No Squat entries found in historyData';
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 populateExerciseDropdown();
