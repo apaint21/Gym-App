@@ -253,26 +253,7 @@
 
       <!-- DEBUG PANEL (temporary) -->
       <div id="debug-panel" style="display:none;background:#1a1a2e;border:1px solid #c8f135;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.7rem;color:#c8f135;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;font-family:monospace;"></div>
-      <button type="button" onclick="
-        const p=document.getElementById('debug-panel');
-        p.style.display='block';
-        const ex=(preloadedExercises[currentDay]||[]).find(e=>e.name===document.getElementById('exercise-input').value);
-        const wdEntries=(workoutsData[currentDay]||[]).filter(w=>w.exercise===document.getElementById('exercise-input').value);
-        const wdEntry=wdEntries[wdEntries.length-1]||null;
-        const byId=wdEntry&&wdEntry._id?historyData.find(h=>h._id===wdEntry._id):null;
-        const allForEx=historyData.filter(h=>h.exercise===document.getElementById('exercise-input').value);
-        p.textContent='currentDay: '+currentDay+'
-exercise: '+document.getElementById('exercise-input').value+'
-
-workoutsData entry:
-'+JSON.stringify(wdEntry,null,2)+'
-
-historyData match by _id:
-'+JSON.stringify(byId,null,2)+'
-
-ALL historyData for this exercise:
-'+JSON.stringify(allForEx,null,2);
-      " style="width:100%;padding:8px;background:none;border:1px dashed #5b8aff;color:#5b8aff;border-radius:8px;font-size:0.8rem;margin-bottom:10px;cursor:pointer;">🔍 Debug</button>
+      <button type="button" id="debug-btn" style="width:100%;padding:8px;background:none;border:1px dashed #5b8aff;color:#5b8aff;border-radius:8px;font-size:0.8rem;margin-bottom:10px;cursor:pointer;">🔍 Debug</button>
 
       <!-- Edit mode banner -->
       <div class="edit-banner" id="edit-banner">
@@ -413,6 +394,27 @@ ALL historyData for this exercise:
 <div id="toast"></div>
 
 <script>
+// ─── DEBUG ───────────────────────────────────────────────────────────────────
+function runDebug() {
+  var exName = document.getElementById('exercise-input').value;
+  var p = document.getElementById('debug-panel');
+  p.style.display = 'block';
+  var wdAll = (workoutsData[currentDay] || []).filter(function(w){ return w.exercise === exName; });
+  var wdEntry = wdAll[wdAll.length - 1] || null;
+  var byId = (wdEntry && wdEntry._id) ? historyData.find(function(h){ return h._id === wdEntry._id; }) : null;
+  var allForEx = historyData.filter(function(h){ return h.exercise === exName; });
+  var out = 'currentDay: ' + currentDay + '\n';
+  out += 'exercise: ' + exName + '\n\n';
+  out += 'workoutsData entry:\n' + JSON.stringify(wdEntry, null, 2) + '\n\n';
+  out += 'historyData by _id:\n' + JSON.stringify(byId, null, 2) + '\n\n';
+  out += 'ALL historyData for exercise:\n' + JSON.stringify(allForEx, null, 2);
+  p.textContent = out;
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('debug-btn');
+  if (btn) btn.addEventListener('click', runDebug);
+});
+
 // ─── EXERCISE DATA ────────────────────────────────────────────────────────────
 const preloadedExercises = {
 
@@ -1230,6 +1232,8 @@ document.getElementById('debug-squat-btn').addEventListener('click', function() 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 populateExerciseDropdown();
 renderWorkouts();
+document.getElementById('debug-btn').addEventListener('click', runDebug);
 </script>
 </body>
 </html>
+
