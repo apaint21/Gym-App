@@ -251,6 +251,10 @@
     <div class="card">
       <div class="card-title">Log a Set</div>
 
+      <!-- DEBUG PANEL (temporary) -->
+      <div id="debug-panel" style="display:none;background:#1a1a2e;border:1px solid #c8f135;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.72rem;color:#c8f135;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;font-family:monospace;"></div>
+      <button type="button" id="debug-btn" onclick="const sq=historyData.filter(h=>h.exercise==='Squat');const p=document.getElementById('debug-panel');p.style.display='block';p.textContent='Squat entries:\n'+JSON.stringify(sq,null,2);" style="width:100%;padding:8px;background:none;border:1px dashed #5b8aff;color:#5b8aff;border-radius:8px;font-size:0.8rem;margin-bottom:10px;cursor:pointer;">🔍 Debug: Show Squat history</button>
+
       <!-- Edit mode banner -->
       <div class="edit-banner" id="edit-banner">
         ✏️ Editing entry — make your changes below
@@ -374,6 +378,17 @@
     <span class="export-icon">⚠️</span>
     <span class="export-text"><strong style="color:var(--danger)">Reset All History</strong><span>Wipe all logged sessions and start fresh</span></span>
   </button>
+
+  <div class="section-label" style="margin-top:24px">Debug</div>
+  <button class="export-btn" onclick="var entries=historyData.filter(function(h){return h.exercise==='Squat';});var out=entries.length?entries.map(function(h,i){return i+:
+
+  <div class="section-label" style="margin-top:24px">Debug</div>
+  <button class="export-btn" id="debug-squat-btn">
+    <span class="export-icon">&#128269;</span>
+    <span class="export-text"><strong>Show Squat historyData</strong><span>Tap after editing Squat to inspect stored entries</span></span>
+  </button>
+  <pre id="debug-out" style="display:none;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:0.75rem;color:var(--accent);white-space:pre-wrap;word-break:break-all;margin-top:8px;line-height:1.7"></pre>
+
 </div>
 
 <div id="toast"></div>
@@ -707,7 +722,7 @@ function updateExerciseDetails() {
     if (repHint) repHint.textContent = `target: ${ex.reps}`;
     // Pre-fill reps from last session if not user-edited
     if (!repsInput.dataset.userEdited) {
-      const lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name);
+      const lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name && h.day === currentDay);
       if (lastEntry) {
         repsInput.value = lastEntry.reps;
         repsInput.dataset.userEdited = 'prefill';
@@ -736,7 +751,7 @@ function updateExerciseDetails() {
     const lookFor = (aEl && aEl.value) || (bEl && bEl.value) || null;
     lastEntry = lookFor ? [...historyData].reverse().find(h => h.exercise === lookFor) : null;
   } else {
-    lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name);
+    lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name && h.day === currentDay);
   }
   if (lastEntry) {
     const d = new Date(lastEntry.date + 'T12:00:00');
@@ -1167,6 +1182,20 @@ document.getElementById('clear-btn').addEventListener('click', () => {
   workoutsData[currentDay] = [];
   if (editingIndex !== null) cancelEdit();
   saveData(); renderWorkouts(); showToast('Cleared!');
+});
+
+
+// ─── DEBUG ────────────────────────────────────────────────────────────────────
+document.getElementById('debug-squat-btn').addEventListener('click', function() {
+  var entries = historyData.filter(function(h) { return h.exercise === 'Squat'; });
+  var out = entries.length
+    ? entries.map(function(h, i) {
+        return i + ': day=' + h.day + '  date=' + h.date + '  reps=' + h.reps + '  weight=' + h.weight + '  equip=' + h.equipment + '  mood=' + h.mood;
+      }).join('\n')
+    : 'No Squat entries found in historyData';
+  var el = document.getElementById('debug-out');
+  el.textContent = out;
+  el.style.display = 'block';
 });
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
