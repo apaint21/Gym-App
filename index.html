@@ -251,10 +251,6 @@
     <div class="card">
       <div class="card-title">Log a Set</div>
 
-      <!-- DEBUG PANEL (temporary) -->
-      <div id="debug-panel" style="display:none;background:#1a1a2e;border:1px solid #c8f135;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.72rem;color:#c8f135;white-space:pre-wrap;word-break:break-all;max-height:200px;overflow-y:auto;font-family:monospace;"></div>
-      <button type="button" id="debug-btn" onclick="const sq=historyData.filter(h=>h.exercise==='Squat');const p=document.getElementById('debug-panel');p.style.display='block';p.textContent='Squat entries:\n'+JSON.stringify(sq,null,2);" style="width:100%;padding:8px;background:none;border:1px dashed #5b8aff;color:#5b8aff;border-radius:8px;font-size:0.8rem;margin-bottom:10px;cursor:pointer;">🔍 Debug: Show Squat history</button>
-
       <!-- Edit mode banner -->
       <div class="edit-banner" id="edit-banner">
         ✏️ Editing entry — make your changes below
@@ -722,7 +718,7 @@ function updateExerciseDetails() {
     if (repHint) repHint.textContent = `target: ${ex.reps}`;
     // Pre-fill reps from last session if not user-edited
     if (!repsInput.dataset.userEdited) {
-      const lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name && h.day === currentDay);
+      const lastEntry = [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
       if (lastEntry) {
         repsInput.value = lastEntry.reps;
         repsInput.dataset.userEdited = 'prefill';
@@ -751,7 +747,7 @@ function updateExerciseDetails() {
     const lookFor = (aEl && aEl.value) || (bEl && bEl.value) || null;
     lastEntry = lookFor ? [...historyData].reverse().find(h => h.exercise === lookFor) : null;
   } else {
-    lastEntry = [...historyData].reverse().find(h => h.exercise === ex.name && h.day === currentDay);
+    lastEntry = [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
   }
   if (lastEntry) {
     const d = new Date(lastEntry.date + 'T12:00:00');
@@ -1204,3 +1200,4 @@ renderWorkouts();
 </script>
 </body>
 </html>
+
