@@ -718,9 +718,13 @@ function updateExerciseDetails() {
     if (repHint) repHint.textContent = `target: ${ex.reps}`;
     // Pre-fill reps from last session if not user-edited
     if (!repsInput.dataset.userEdited) {
-      const lastEntry = [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
-      if (lastEntry) {
-        repsInput.value = lastEntry.reps;
+      const wdReps = (workoutsData[currentDay] || []).filter(w => w.exercise === ex.name);
+      const wdRepEntry = wdReps[wdReps.length - 1] || null;
+      const lastRepsEntry = wdRepEntry && wdRepEntry._id
+        ? historyData.find(h => h._id === wdRepEntry._id) || null
+        : [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
+      if (lastRepsEntry) {
+        repsInput.value = lastRepsEntry.reps;
         repsInput.dataset.userEdited = 'prefill';
       } else {
         repsInput.value = '';
@@ -747,7 +751,13 @@ function updateExerciseDetails() {
     const lookFor = (aEl && aEl.value) || (bEl && bEl.value) || null;
     lastEntry = lookFor ? [...historyData].reverse().find(h => h.exercise === lookFor) : null;
   } else {
-    lastEntry = [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
+    // Find the most recent workoutsData entry for this exercise on this day,
+    // then look it up in historyData by _id so we always show the right one
+    const wdEntries = (workoutsData[currentDay] || []).filter(w => w.exercise === ex.name);
+    const wdEntry = wdEntries[wdEntries.length - 1] || null;
+    lastEntry = wdEntry && wdEntry._id
+      ? historyData.find(h => h._id === wdEntry._id) || null
+      : [...historyData].filter(h => h.exercise === ex.name && h.day === currentDay).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
   }
   if (lastEntry) {
     const d = new Date(lastEntry.date + 'T12:00:00');
@@ -854,6 +864,8 @@ form.addEventListener('submit', e => {
       workoutsData[currentDay][editingIndex] = entry;
 
       // If date changed, migrate only entries from the same day-tab and same old date
+      // Always carry the _id forward so we can find it in historyData
+      if (oldEntry._id) entry._id = oldEntry._id;
       if (oldDate !== date) {
         historyData.forEach(h => {
           if (h.day === currentDay && h.date === oldDate) h.date = date;
@@ -861,21 +873,19 @@ form.addEventListener('submit', e => {
         (workoutsData[currentDay] || []).forEach(w => {
           if (w.date === oldDate) w.date = date;
         });
-      } else {
-        // Date unchanged — update the most recent matching history entry (same logic the hint uses)
-        let hi = -1;
-        for (let i = historyData.length - 1; i >= 0; i--) {
-          const h = historyData[i];
-          if (h.day === currentDay && h.date === oldDate && h.exercise === oldExercise) { hi = i; break; }
-        }
-        if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
       }
+      // Update historyData — use _id if available, otherwise fall back to field match
+      const hi = oldEntry._id
+        ? historyData.findIndex(h => h._id === oldEntry._id)
+        : (() => { let i = historyData.length - 1; for (; i >= 0; i--) { const h = historyData[i]; if (h.day === currentDay && h.date === oldDate && h.exercise === oldExercise) break; } return i; })();
+      if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
       showToast('✏️ Entry updated!');
       cancelEdit(exercise);
       saveData(); renderWorkouts();
       return;
     } else {
       const nextEx = getNextExerciseName(exercise);
+      entry._id = Date.now() + '-' + Math.random();
       workoutsData[currentDay].push(entry);
       historyData.push({ ...entry, day: currentDay });
       showToast('✅ Set logged!');
@@ -1200,4 +1210,3 @@ renderWorkouts();
 </script>
 </body>
 </html>
-
