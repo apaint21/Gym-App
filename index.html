@@ -579,7 +579,7 @@ weightInput.addEventListener('input', () => {
 });
 
 // ─── CANCEL EDIT ─────────────────────────────────────────────────────────────
-function cancelEdit(restoreExercise) {
+function cancelEdit() {
   editingIndex = null;
   editBanner.classList.remove('show');
   submitBtn.textContent = '+ Add Set';
@@ -587,8 +587,7 @@ function cancelEdit(restoreExercise) {
   form.reset();
   sessionDateInput.value = new Date().toISOString().split('T')[0];
   weightInput.dataset.userEdited = '';
-  repsInput.dataset.userEdited = '';
-  populateExerciseDropdown(restoreExercise || undefined);
+  populateExerciseDropdown();
   updateExerciseDetails();
 }
 document.getElementById('cancel-edit-btn').addEventListener('click', cancelEdit);
@@ -811,7 +810,7 @@ form.addEventListener('submit', e => {
       const hiB = historyData.findIndex(h => h.day === currentDay && h.date === (oldB && oldB.date) && h.exercise === (oldB && oldB.exercise));
       if (hiB >= 0) historyData[hiB] = { ...bEntry, day: currentDay };
       showToast('✏️ Superset updated!');
-      cancelEdit(exercise);
+      cancelEdit();
     } else {
       workoutsData[currentDay].push(aEntry, bEntry);
       historyData.push({ ...aEntry, day: currentDay }, { ...bEntry, day: currentDay });
@@ -856,8 +855,8 @@ form.addEventListener('submit', e => {
         if (hi >= 0) historyData[hi] = { ...entry, day: currentDay };
       }
       showToast('✏️ Entry updated!');
-      cancelEdit(exercise);
-      saveData(); renderWorkouts();
+      cancelEdit();
+      saveData(); renderWorkouts(); updateExerciseDetails();
       return;
     } else {
       const nextEx = getNextExerciseName(exercise);
