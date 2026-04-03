@@ -856,6 +856,8 @@ form.addEventListener('submit', e => {
       }
       showToast('✏️ Entry updated!');
       cancelEdit();
+      saveData(); renderWorkouts(); updateExerciseDetails();
+      return;
     } else {
       const nextEx = getNextExerciseName(exercise);
       workoutsData[currentDay].push(entry);
@@ -872,6 +874,7 @@ form.addEventListener('submit', e => {
 
   saveData();
   renderWorkouts();
+  updateExerciseDetails();
 });
 
 // ─── ENTER EDIT MODE ──────────────────────────────────────────────────────────
@@ -969,9 +972,14 @@ function renderWorkouts() {
     });
     wList.querySelectorAll('.del-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        workoutsData[currentDay].splice(parseInt(btn.dataset.index), 1);
+        const idx = parseInt(btn.dataset.index);
+        const deleted = workoutsData[currentDay][idx];
+        workoutsData[currentDay].splice(idx, 1);
+        // Remove the matching entry from historyData so the calendar and hint stay in sync
+        const hiIdx = historyData.findIndex(h => h.day === currentDay && h.date === deleted.date && h.exercise === deleted.exercise);
+        if (hiIdx >= 0) historyData.splice(hiIdx, 1);
         if (editingIndex !== null) cancelEdit();
-        saveData(); renderWorkouts(); showToast('🗑 Deleted');
+        saveData(); renderWorkouts(); updateExerciseDetails(); showToast('🗑 Deleted');
       });
     });
   } else {
